@@ -1,5 +1,6 @@
 import sqlite3
 import random
+import os  # Import os module for path handling
 
 def connect_db():
     conn = sqlite3.connect('Systemdb.db')
@@ -127,6 +128,10 @@ def add_pet(user_id, name, species, age, picture_path=None):
         conn = sqlite3.connect('Systemdb.db')
         cursor = conn.cursor()
 
+        # Resolve picture_path to an absolute path if provided
+        if picture_path:
+            picture_path = os.path.abspath(picture_path)
+
         # Insert pet details into the pets table
         cursor.execute("""
             INSERT INTO pets (user_id, name, species, age, picture_path)
@@ -137,5 +142,34 @@ def add_pet(user_id, name, species, age, picture_path=None):
     except sqlite3.Error as e:
         print(f"Database error: {e}")  # Debugging output
         raise
+    finally:
+        conn.close()
+
+def delete_pet(user_id, pet_name):
+    """Delete a pet by name for a specific user."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM pets WHERE user_id = ? AND name = ?", (user_id, pet_name))
+        conn.commit()
+    finally:
+        conn.close()
+
+def edit_pet(user_id, old_name, new_name, new_species, new_age, new_picture_path=None):
+    """Edit a pet's details."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+
+        # Resolve picture_path to an absolute path if provided
+        if new_picture_path:
+            new_picture_path = os.path.abspath(new_picture_path)
+
+        cursor.execute("""
+            UPDATE pets
+            SET name = ?, species = ?, age = ?, picture_path = ?
+            WHERE user_id = ? AND name = ?
+        """, (new_name, new_species, new_age, new_picture_path, user_id, old_name))
+        conn.commit()
     finally:
         conn.close()

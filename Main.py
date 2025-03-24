@@ -3,6 +3,7 @@ from tkinter import messagebox, simpledialog, filedialog, ttk
 from tkinter.ttk import Combobox
 import database as db
 import random
+from PIL import Image, ImageTk  # Add this import for image handling
 
 db.connect_db()
 
@@ -105,45 +106,94 @@ class PetServiceManagementSystem:
         self.clear_frame()
         tk.Label(self.frame, text="Manage My Pets", font=("Arial", 20, "bold")).pack(pady=10)
 
-        table_frame = tk.Frame(self.frame)
-        table_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-
-        columns = ("Name", "Species", "Age", "Picture")
-        pet_table = ttk.Treeview(table_frame, columns=columns, show="headings", height=10)
-
-        pet_table.heading("Name", text="Name")
-        pet_table.heading("Species", text="Species")
-        pet_table.heading("Age", text="Age")
-        pet_table.heading("Picture", text="Picture")
-
-        pet_table.column("Name", width=150, anchor=tk.CENTER)
-        pet_table.column("Species", width=100, anchor=tk.CENTER)
-        pet_table.column("Age", width=50, anchor=tk.CENTER)
-        pet_table.column("Picture", width=200, anchor=tk.CENTER)
-
-        pet_table.pack(fill=tk.BOTH, expand=True, side=tk.LEFT)
-        scrollbar = ttk.Scrollbar(table_frame, orient=tk.VERTICAL, command=pet_table.yview)
-        pet_table.configure(yscrollcommand=scrollbar.set)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
         pets = db.get_user_pets(username)
         if pets:
             for pet in pets:
+                pet_frame = tk.Frame(self.frame, borderwidth=1, relief="solid", padx=10, pady=10)
+                pet_frame.pack(fill=tk.X, padx=10, pady=5)
+
+                # Display pet details
+                details = f"Name: {pet['name']}\nSpecies: {pet['species']}\nAge: {pet['age']}"
+                tk.Label(pet_frame, text=details, justify="left").pack(side=tk.LEFT, padx=10)
+
+                # Display pet image
                 try:
                     if pet["picture_path"]:
-                        image = tk.PhotoImage(file=pet["picture_path"]).subsample(4, 4)
-                        pet_table.image = image  # Save a reference to avoid garbage collection
-                        pet_table.insert("", tk.END, values=(pet["name"],pet["species"],pet["age"],"Image Displayed"
-                        ))
+                        pil_image = Image.open(pet["picture_path"]).resize((100, 100), Image.LANCZOS)
+                        image = ImageTk.PhotoImage(pil_image)
+                        image_label = tk.Label(pet_frame, image=image)
+                        image_label.image = image  # Keep a reference to avoid garbage collection
+                        image_label.pack(side=tk.RIGHT, padx=10)
                     else:
-                        pet_table.insert("", tk.END, values=(pet["name"],pet["species"],pet["age"],"No Image"))
+                        tk.Label(pet_frame, text="No Image").pack(side=tk.RIGHT, padx=10)
                 except Exception as e:
                     print(f"Error loading image: {e}")
-                    pet_table.insert("", tk.END, values=(pet["name"],pet["species"],pet["age"],"Error Displaying Image"))
+                    tk.Label(pet_frame, text="Error Displaying Image").pack(side=tk.RIGHT, padx=10)
+
+                # Add Edit and Delete buttons
+                tk.Button(pet_frame, text="Edit", command=lambda pet=pet: self.EditPet(username, pet)).pack(side=tk.RIGHT, padx=5)
+                tk.Button(pet_frame, text="Delete", command=lambda pet=pet: self.DeletePet(username, pet['name'])).pack(side=tk.RIGHT, padx=5)
         else:
             tk.Label(self.frame, text="No pets registered yet.").pack(pady=5)
+
         tk.Button(self.frame, text="Add Pet", font=("Arial", 12, "bold"), command=lambda: self.AddPet(username)).pack(pady=5)
         tk.Button(self.frame, text="Back", command=lambda: self.load_patient_dashboard(username)).pack(pady=10)
+
+    def DeletePet(self, username, pet_name):
+        try:
+            user_id = db.get_user_id(username)
+            if not user_id:
+                raise ValueError("User not found.")
+            db.delete_pet(user_id, pet_name)
+            messagebox.showinfo("Success", f"Pet '{pet_name}' deleted successfully!")
+            self.ManageMyPets(username)
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to delete pet: {e}")
+
+    def EditPet(self, username, pet):
+        self.clear_frame()
+        tk.Label(self.frame, text="Edit Pet", font=("Arial", 20, "bold")).grid(row=0, column=0, columnspan=2, pady=10)
+        tk.Label(self.frame, text="Name").grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        pet_name = tk.Entry(self.frame)
+        pet_name.insert(0, pet['name'])
+        pet_name.grid(row=1, column=1, padx=10, pady=5)
+        tk.Label(self.frame, text="Species").grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        species_options = ["Dog", "Cat"]
+        pet_species = Combobox(self.frame, values=species_options, state="readonly")
+        pet_species.set(pet['species'])
+        pet_species.grid(row=2, column=1, padx=10, pady=5)
+        tk.Label(self.frame, text="Age").grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        pet_age = tk.Entry(self.frame)
+        pet_age.insert(0, pet['age'])
+        pet_age.grid(row=3, column=1, padx=10, pady=5)
+        tk.Label(self.frame, text="Upload Picture").grid(row=4, column=0, padx=10, pady=5, sticky="w")
+        picture_path_label = tk.Label(self.frame, text=pet['picture_path'] or "No file selected")
+        picture_path_label.grid(row=4, column=1, padx=10, pady=5)
+        upload_button = tk.Button(self.frame, text="Upload Picture", command=lambda: self.upload_picture(picture_path_label))
+        upload_button.grid(row=5, column=1, padx=10, pady=5)
+        save_button = tk.Button(self.frame, text="Save", font=("Arial", 12, "bold"),
+                                command=lambda: self.submit_edit_pet(username, pet['name'], pet_name.get(), pet_species.get(), pet_age.get(), picture_path_label.cget("text")))
+        save_button.grid(row=6, column=0, padx=10, pady=10)
+        back_button = tk.Button(self.frame, text="Cancel", font=("Arial", 12, "bold"), command=lambda: self.ManageMyPets(username))
+        back_button.grid(row=6, column=1, padx=10, pady=10)
+
+    def submit_edit_pet(self, username, old_name, new_name, new_species, new_age, new_picture_path=None):
+        try:
+            if not all([username, new_name, new_species, new_age]):
+                raise ValueError("All fields are required.")
+            new_age = int(new_age) if new_age.isdigit() else None
+            if new_age is None:
+                raise ValueError("Age must be a number.")
+            user_id = db.get_user_id(username)
+            if not user_id:
+                raise ValueError("User not found.")
+            db.edit_pet(user_id, old_name, new_name, new_species, new_age, new_picture_path)
+            messagebox.showinfo("Success", "Pet details updated successfully!")
+            self.ManageMyPets(username)
+        except ValueError as ve:
+            messagebox.showerror("Input Error", str(ve))
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to update pet: {e}")
 
     def AddPet(self, username):
         self.clear_frame()
@@ -190,7 +240,7 @@ class PetServiceManagementSystem:
             messagebox.showerror("Input Error", str(ve))
         except Exception as e:
             messagebox.showerror("Error", f"Failed to add pet: {e}")
-    
+
     def GroomingServices(self, username):
         self.clear_frame()
         tk.Label(self.frame, text="Grooming Services", font=("Arial", 20, "bold")).pack(pady=10)
