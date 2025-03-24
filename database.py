@@ -51,19 +51,6 @@ def connect_db():
     );
     """)
 
-    # Create Service History Table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS service_history (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        pet_name TEXT NOT NULL,
-        service_type TEXT NOT NULL,
-        date TEXT NOT NULL,
-        details TEXT,
-        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-    );
-    """)
-
     # Insert Predefined Doctor if Not Exists
     cursor.execute("SELECT COUNT(*) FROM doctors WHERE username = ?", ("dr_marlo",))
     if cursor.fetchone()[0] == 0:
@@ -212,34 +199,5 @@ def get_all_pets():
         cursor.execute("SELECT user_id, name, species FROM pets")
         pets = [{"user_id": row[0], "name": row[1], "species": row[2]} for row in cursor.fetchall()]
         return pets
-    finally:
-        conn.close()
-
-def add_service_history(user_id, pet_name, service_type, date, details=None):
-    """Add a record to the service history."""
-    try:
-        conn = sqlite3.connect('Systemdb.db')
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO service_history (user_id, pet_name, service_type, date, details)
-            VALUES (?, ?, ?, ?, ?)
-        """, (user_id, pet_name, service_type, date, details))
-        conn.commit()
-    finally:
-        conn.close()
-
-def get_service_history(user_id):
-    """Retrieve all service history for a specific user."""
-    try:
-        conn = sqlite3.connect('Systemdb.db')
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT pet_name, service_type, date, details
-            FROM service_history
-            WHERE user_id = ?
-            ORDER BY date DESC
-        """, (user_id,))
-        history = [{"pet_name": row[0], "service_type": row[1], "date": row[2], "details": row[3]} for row in cursor.fetchall()]
-        return history
     finally:
         conn.close()
