@@ -29,8 +29,13 @@ class PetServiceManagementSystem:
             widget.destroy()
 
     def back_to_main(self):
+        """Clear the frame and show the main content."""
         self.clear_frame()
-        self.__init__(self.window)
+        tk.Label(self.window, text="Pet Service Management System", font=("Arial", 20)).pack()
+        self.frame = tk.Frame(self.window)
+        self.frame.pack()
+        tk.Button(self.frame, text="User", command=self.User).grid(row=0, column=0, padx=5, pady=5)
+        tk.Button(self.frame, text="Admin", command=self.Doctor).grid(row=0, column=1, padx=5, pady=5)
 
     def User(self):
         self.clear_frame()
@@ -41,9 +46,52 @@ class PetServiceManagementSystem:
 
     def Doctor(self):
         self.clear_frame()
-        tk.Label(self.frame, text="Doctor").grid(row=0, column=0, padx=5, pady=5)
-        tk.Button(self.frame, text="Login", command=self.DoctorLogIn).grid(row=1, column=0, padx=5, pady=5)
-        tk.Button(self.frame, text="Back", command=self.back_to_main).grid(row=2, column=0, padx=5, pady=5)
+        tk.Label(self.frame, text="Admin Login", font=("Arial", 20, "bold")).grid(row=0, column=0, columnspan=2, pady=10)
+        tk.Label(self.frame, text="Username").grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        admin_username = tk.Entry(self.frame)
+        admin_username.grid(row=1, column=1, padx=10, pady=5)
+        tk.Label(self.frame, text="Password").grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        admin_password = tk.Entry(self.frame, show="*")
+        admin_password.grid(row=2, column=1, padx=10, pady=5)
+        tk.Button(self.frame, text="Login", font=("Arial", 12, "bold"),
+                  command=lambda: self.AdminLogin(admin_username.get(), admin_password.get())).grid(row=3, column=0, columnspan=2, pady=10)
+        tk.Button(self.frame, text="Back", command=self.back_to_main).grid(row=4, column=0, columnspan=2, pady=10)
+
+    def AdminLogin(self, username, password):
+        if username == "admin" and password == "admin":
+            messagebox.showinfo("Success", "Admin login successful!")
+            self.load_admin_dashboard()
+        else:
+            messagebox.showerror("Login Failed", "Invalid admin credentials.")
+
+    def load_admin_dashboard(self):
+        self.clear_frame()
+        tk.Label(self.frame, text="Admin Dashboard", font=("Arial", 20, "bold")).pack(pady=10)
+        tk.Button(self.frame, text="View All Users", font=("Arial", 12, "bold"), command=self.view_all_users).pack(pady=5)
+        tk.Button(self.frame, text="View All Pets", font=("Arial", 12, "bold"), command=self.view_all_pets).pack(pady=5)
+        tk.Button(self.frame, text="Back", command=self.back_to_main).pack(pady=10)
+
+    def view_all_users(self):
+        self.clear_frame()
+        tk.Label(self.frame, text="All Users", font=("Arial", 20, "bold")).pack(pady=10)
+        users = db.get_all_users()
+        if users:
+            for user in users:
+                tk.Label(self.frame, text=f"ID: {user['id']}, Username: {user['username']}").pack(pady=5)
+        else:
+            tk.Label(self.frame, text="No users found.").pack(pady=5)
+        tk.Button(self.frame, text="Back", command=self.load_admin_dashboard).pack(pady=10)
+
+    def view_all_pets(self):
+        self.clear_frame()
+        tk.Label(self.frame, text="All Pets", font=("Arial", 20, "bold")).pack(pady=10)
+        pets = db.get_all_pets()
+        if pets:
+            for pet in pets:
+                tk.Label(self.frame, text=f"Name: {pet['name']}, Species: {pet['species']}, Owner ID: {pet['user_id']}").pack(pady=5)
+        else:
+            tk.Label(self.frame, text="No pets found.").pack(pady=5)
+        tk.Button(self.frame, text="Back", command=self.load_admin_dashboard).pack(pady=10)
 
     def UserLogIn(self):
         self.clear_frame()

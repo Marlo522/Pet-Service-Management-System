@@ -58,6 +58,12 @@ def connect_db():
                        ("Dr. Marlo Veluz", "General Medicine", "dr_marlo", "marlo"))
         conn.commit()
 
+    # Insert Predefined Admin Account if Not Exists
+    cursor.execute("SELECT COUNT(*) FROM users WHERE username = ?", ("admin",))
+    if cursor.fetchone()[0] == 0:
+        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", ("admin", "admin"))
+        conn.commit()
+
     conn.close()
 
 def insert_user(username, password):
@@ -171,5 +177,27 @@ def edit_pet(user_id, old_name, new_name, new_species, new_age, new_picture_path
             WHERE user_id = ? AND name = ?
         """, (new_name, new_species, new_age, new_picture_path, user_id, old_name))
         conn.commit()
+    finally:
+        conn.close()
+
+def get_all_users():
+    """Retrieve all users from the database."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, username FROM users")
+        users = [{"id": row[0], "username": row[1]} for row in cursor.fetchall()]
+        return users
+    finally:
+        conn.close()
+
+def get_all_pets():
+    """Retrieve all pets from the database."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT user_id, name, species FROM pets")
+        pets = [{"user_id": row[0], "name": row[1], "species": row[2]} for row in cursor.fetchall()]
+        return pets
     finally:
         conn.close()
