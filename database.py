@@ -50,6 +50,17 @@ def connect_db():
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     );
     """)
+    
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS grooming_services (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        pet_name TEXT NOT NULL,
+        service_type TEXT NOT NULL,
+        service_date TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    );
+    """)
 
     # Insert Predefined Doctor if Not Exists
     cursor.execute("SELECT COUNT(*) FROM doctors WHERE username = ?", ("dr_marlo",))
@@ -199,5 +210,59 @@ def get_all_pets():
         cursor.execute("SELECT user_id, name, species FROM pets")
         pets = [{"user_id": row[0], "name": row[1], "species": row[2]} for row in cursor.fetchall()]
         return pets
+    finally:
+        conn.close()
+        
+def add_grooming_service(user_id, pet_name, service_type, service_date):
+    """Add a grooming service booking to the database."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO grooming_services (user_id, pet_name, service_type, service_date)
+            VALUES (?, ?, ?, ?)
+        """, (user_id, pet_name, service_type, service_date))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")  # Debugging output
+        raise
+    finally:
+        conn.close()
+
+def get_grooming_appointments(username):
+    """Retrieve all grooming appointments for a specific user."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+
+        # Get user ID from username
+        cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
+        user = cursor.fetchone()
+        if not user:
+            return []
+
+        user_id = user[0]
+
+        # Fetch grooming appointments for the user
+        cursor.execute("""
+            SELECT id, pet_name, service_type, service_date
+            FROM grooming_services
+            WHERE user_id = ?
+        """, (user_id,))
+        appointments = [
+            {"id": row[0], "pet_name": row[1], "service_type": row[2], "service_date": row[3]}
+            for row in cursor.fetchall()
+        ]
+        return appointments
+    finally:
+        conn.close()
+
+def cancel_grooming_appointment(appointment_id):
+    """Cancel a grooming appointment by its ID."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM grooming_services WHERE id = ?", (appointment_id,))
+        conn.commit()
     finally:
         conn.close()
