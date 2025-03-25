@@ -292,73 +292,97 @@ class PetServiceManagementSystem:
 
     def GroomingServices(self, username):
         self.clear_frame()
-        tk.Label(self.frame, text="Grooming Services", font=("Arial", 20, "bold")).pack(pady=10)
+        tk.Label(self.frame, text="Grooming Services", font=("Arial", 20, "bold")).grid(row=0, column=0, columnspan=2, pady=10)
 
-        # Fetch user's pets
+    # Fetch user's pets
         pets = db.get_user_pets(username)
         if not pets:
-            tk.Label(self.frame, text="No pets registered. Please add a pet first.", font=("Arial", 12)).pack(pady=10)
-            tk.Button(self.frame, text="Back", command=lambda: self.load_patient_dashboard(username)).pack(pady=10)
+            tk.Label(self.frame, text="No pets registered. Please add a pet first.", font=("Arial", 12)).grid(row=1, column=0, columnspan=2, pady=10)
+            tk.Button(self.frame, text="Back", command=lambda: self.load_patient_dashboard(username)).grid(row=2, column=0, columnspan=2, pady=10)
             return
 
-        # Pet selection dropdown
-        tk.Label(self.frame, text="Select Pet:", font=("Arial", 12)).pack(pady=5)
-        pet_names = [pet["name"] for pet in pets]
+    # Pet selection dropdown
+        tk.Label(self.frame, text="Select Pet:", font=("Arial", 12)).grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        pet_options = [pet["name"] for pet in pets]
         selected_pet = tk.StringVar()
-        pet_dropdown = Combobox(self.frame, textvariable=selected_pet, values=pet_names, state="readonly")
-        pet_dropdown.pack(pady=5)
+        pet_dropdown = ttk.Combobox(self.frame, values=pet_options, textvariable=selected_pet, state="readonly")
+        pet_dropdown.grid(row=3, column=1, padx=10, pady=5, sticky="w")
 
-        # Grooming services checkboxes
-        tk.Label(self.frame, text="Select Services:", font=("Arial", 12)).pack(pady=10)
-        services = [
-        "Basic Grooming",
-        "Full Grooming",
-        "Nail Clipping",
-        "Ear Cleaning",
-        "Bath & Blow Dry"
-        ]
-        selected_services = {service: tk.BooleanVar() for service in services}
-        for service in services:
-            tk.Checkbutton(self.frame, text=service, variable=selected_services[service]).pack(anchor="w", padx=20)
+    # Grooming services radio buttons
+        tk.Label(self.frame, text="Select Service:", font=("Arial", 12)).grid(row=4, column=0, padx=10, pady=5, sticky="w")
+        selected_service = tk.StringVar()
+        services = ["Basic Grooming", "Full Grooming", "Nail Clipping", "Ear Cleaning", "Bath & Blow Dry"]
+        for i, service in enumerate(services):
+            tk.Radiobutton(self.frame, text=service, variable=selected_service, value=service).grid(row=5 + i, column=0, padx=10, pady=2, sticky="w")
 
-        # Submit button
+    # Date selection dropdown
+        tk.Label(self.frame, text="Select Date:", font=("Arial", 12)).grid(row=4, column=1, padx=10, pady=5, sticky="w")
+        available_dates = ["2025-03-25", "2025-03-26", "2025-03-27", "2025-03-28"]  # Example dates
+        selected_date = tk.StringVar(value=available_dates[0])
+        date_dropdown = ttk.Combobox(self.frame, textvariable=selected_date, values=available_dates, state="readonly")
+        date_dropdown.grid(row=5, column=1, padx=10, pady=5, sticky="w")
+
+    # Book button
         tk.Button(
         self.frame,
-        text="Book Now",
+        text="Book Service",
         font=("Arial", 12, "bold"),
-        command=lambda: self.book_grooming(username, selected_pet.get(), selected_services)
-        ).pack(pady=10)
+        command=lambda: self.book_grooming(username, selected_pet.get(), selected_service.get(), selected_date.get())
+    ).grid(row=10, column=0, columnspan=2, pady=10)
+        
+    # my grooming appointments
+        tk.Label(self.frame, text="My Grooming Appointments", font=("Arial", 16, "bold")).grid(row=11, column=0, columnspan=2, pady=10)
+        appointments = db.get_grooming_appointments(username)
+        if appointments:
+            for i, appointment in enumerate(appointments):
+                tk.Label(self.frame, text=f"{i + 1}. {appointment['pet_name']} - {appointment['service_type']} - {appointment['service_date']}").grid(row=12 + i, column=0, padx=10, pady=5, sticky="w")
+                tk.Button(
+                self.frame,
+                text="Cancel",
+                command=lambda appointment_id=appointment['id']: self.cancel_grooming(username, appointment_id)
+            ).grid(row=12 + i, column=1, padx=10, pady=5)
+        else:
+            tk.Label(self.frame, text="No grooming appointments found.").grid(row=12, column=0, columnspan=2, pady=5)
 
-        # Back button
-        tk.Button(self.frame, text="Back", command=lambda: self.load_patient_dashboard(username)).pack(pady=10)
+    # Back button
+        tk.Button(self.frame, text="Back", font=("Arial", 12, "bold"), command=lambda: self.load_patient_dashboard(username)).grid(row=20, column=0, columnspan=2, pady=10)
 
-    def book_grooming(self, username, pet_name, selected_services):
+    def cancel_grooming(self, username, appointment_id):
         try:
+            db.cancel_grooming_appointment(appointment_id)
+            messagebox.showinfo("Success", "Grooming appointment canceled successfully!")
+            self.GroomingServices(username)
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to cancel appointment: {e}")
+
+            
+        
+
+    def book_grooming(self, username, pet_name, selected_service, selected_date):
+        try:
+            print(f"Booking details: Pet: {pet_name}, Service: {selected_service}, Date: {selected_date}")  # Debugging output
             if not pet_name:
                 raise ValueError("Please select a pet.")
-            services = [service for service, var in selected_services.items() if var.get()]
-            if not services:
-                raise ValueError("Please select at least one grooming service.")
+            if not selected_service:
+                raise ValueError("Please select a grooming service.")
+            if not selected_date:
+                raise ValueError("Please select a date.")
 
+        # Get the user ID from the username
             user_id = db.get_user_id(username)
             if not user_id:
                 raise ValueError("User not found.")
 
-            # Save to service history
-            db.add_service_history(
-                user_id,
-                pet_name,
-                "Grooming",
-                date="Today",  # Replace with actual date logic if needed
-                details=", ".join(services)
-            )
+        # Save the booking to the database
+            db.add_grooming_service(user_id, pet_name, selected_service, selected_date)
 
-            messagebox.showinfo("Success", f"Grooming services booked for {pet_name}: {', '.join(services)}")
+        # Show success message
+            messagebox.showinfo("Success", f"Grooming service booked for {pet_name} on {selected_date}: {selected_service}")
             self.load_patient_dashboard(username)
         except ValueError as ve:
             messagebox.showerror("Input Error", str(ve))
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to book grooming services: {e}")
+            messagebox.showerror("Error", f"Failed to book grooming service: {e}")
 
     def Daycare(self, username):
         self.clear_frame()
