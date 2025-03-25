@@ -32,8 +32,6 @@ class PetServiceManagementSystem:
     def back_to_main(self):
         """Clear the frame and show the main content."""
         self.clear_frame()
-        tk.Label(self.window, text="Pet Service Management System", font=("Arial", 20)).pack()
-        self.frame = tk.Frame(self.window)
         self.frame.pack()
         tk.Button(self.frame, text="User", command=self.User).grid(row=0, column=0, padx=5, pady=5)
         tk.Button(self.frame, text="Admin", command=self.Doctor).grid(row=0, column=1, padx=5, pady=5)
@@ -323,16 +321,11 @@ class PetServiceManagementSystem:
         date_dropdown.grid(row=5, column=1, padx=10, pady=5, sticky="w")
 
     # Book button
-        tk.Button(
-        self.frame,
-        text="Book Service",
-        font=("Arial", 12, "bold"),
-        command=lambda: self.book_grooming(username, selected_pet.get(), selected_service.get(), selected_date.get())
-    ).grid(row=10, column=0, columnspan=2, pady=10)
-        
-    # my grooming appointments
+        tk.Button(self.frame,text="Book Service",font=("Arial", 12, "bold"),command=lambda: self.book_grooming(username, selected_pet.get(), selected_service.get(), selected_date.get())).grid(row=10, column=0, columnspan=2, pady=10)
+
+    # My grooming appointments
         tk.Label(self.frame, text="My Grooming Appointments", font=("Arial", 16, "bold")).grid(row=11, column=0, columnspan=2, pady=10)
-        appointments = db.get_grooming_appointments(username)
+        appointments = db.get_grooming_appointments(username, status="Pending")  # Fetch only pending appointments
         if appointments:
             for i, appointment in enumerate(appointments):
                 tk.Label(self.frame, text=f"{i + 1}. {appointment['pet_name']} - {appointment['service_type']} - {appointment['service_date']}").grid(row=12 + i, column=0, padx=10, pady=5, sticky="w")
@@ -374,11 +367,12 @@ class PetServiceManagementSystem:
                 raise ValueError("User not found.")
 
         # Save the booking to the database
-            db.add_grooming_service(user_id, pet_name, selected_service, selected_date)
+            status = "Pending"
+            db.add_grooming_service(user_id, pet_name, selected_service, selected_date, status)
 
         # Show success message
             messagebox.showinfo("Success", f"Grooming service booked for {pet_name} on {selected_date}: {selected_service}")
-            self.load_patient_dashboard(username)
+            self.GroomingServices(username)  # Refresh the grooming services page
         except ValueError as ve:
             messagebox.showerror("Input Error", str(ve))
         except Exception as e:
@@ -452,6 +446,7 @@ class PetServiceManagementSystem:
         # Back button
         tk.Button(self.frame, text="Back", command=lambda: self.load_patient_dashboard(username)).pack(pady=10)
 
+    # filepath: c:\Users\User\Documents\GitHub\PetServiceManagementSystem\Main.py
     def submit_daycare_booking(self, username, pet_name, date, drop_off_time, pick_up_time):
         try:
             if not pet_name:
@@ -465,14 +460,16 @@ class PetServiceManagementSystem:
             if not user_id:
                 raise ValueError("User not found.")
 
-            # Save to service history
+        # Save to service history with status 'Pending'
+            status = "Pending"  # Change this to 'Done' if you want it to be marked as completed immediately
             db.add_service_history(
-                user_id,
-                pet_name,
-                "Daycare",
-                date=date,
-                details=f"Drop-off: {drop_off_time}, Pick-up: {pick_up_time}"
-            )
+            user_id,
+            pet_name,
+            "Daycare",
+            date=date,
+            details=f"Drop-off: {drop_off_time}, Pick-up: {pick_up_time}",
+            status=status
+        )
 
             messagebox.showinfo("Success", f"Daycare booked for {pet_name} on {date}.\nDrop-off: {drop_off_time}, Pick-up: {pick_up_time}")
             self.load_patient_dashboard(username)
@@ -491,34 +488,28 @@ class PetServiceManagementSystem:
             tk.Button(self.frame, text="Back", command=lambda: self.load_patient_dashboard(username)).pack(pady=10)
             return
 
-        history = db.get_service_history(user_id)
-        if history:
-            # Separate Grooming Services
-            tk.Label(self.frame, text="Grooming Services", font=("Arial", 16, "bold")).pack(pady=10, anchor="w")
-            grooming_found = False
-            for record in history:
-                if record["service_type"] == "Grooming":
-                    grooming_found = True
-                    details = f"Pet: {record['pet_name']}\nDate: {record['date']}\nDetails: {record['details']}"
-                    tk.Label(self.frame, text=details, justify="left", font=("Arial", 12)).pack(pady=5, anchor="w")
-            if not grooming_found:
-                tk.Label(self.frame, text="No grooming services found.", font=("Arial", 12)).pack(pady=5, anchor="w")
+    # Fetch grooming services with status 'Done'
+        grooming_history = db.get_grooming_services_done(user_id)
 
-            # Separate Daycare Services
-            tk.Label(self.frame, text="Daycare Services", font=("Arial", 16, "bold")).pack(pady=10, anchor="w")
-            daycare_found = False
-            for record in history:
-                if record["service_type"] == "Daycare":
-                    daycare_found = True
-                    details = f"Pet: {record['pet_name']}\nDate: {record['date']}\nDetails: {record['details']}"
-                    tk.Label(self.frame, text=details, justify="left", font=("Arial", 12)).pack(pady=5, anchor="w")
-            if not daycare_found:
-                tk.Label(self.frame, text="No daycare services found.", font=("Arial", 12)).pack(pady=5, anchor="w")
-        else:
+    # Fetch daycare services with status 'Done'
+        daycare_history = db.get_daycare_services_done(user_id)
+
+        if not grooming_history and not daycare_history:
             tk.Label(self.frame, text="No service history found.", font=("Arial", 12)).pack(pady=10)
+        else:
+            if grooming_history:
+                tk.Label(self.frame, text="Grooming Services", font=("Arial", 16, "bold")).pack(pady=10, anchor="w")
+                for record in grooming_history:
+                    details = f"Pet: {record['pet_name']}\nDate: {record['date']}\nService: {record['service_type']}"
+                    tk.Label(self.frame, text=details, justify="left", font=("Arial", 12)).pack(pady=5, anchor="w")
+
+            if daycare_history:
+                tk.Label(self.frame, text="Daycare Services", font=("Arial", 16, "bold")).pack(pady=10, anchor="w")
+                for record in daycare_history:
+                    details = f"Pet: {record['pet_name']}\nDate: {record['date']}\nDetails: {record['details']}\nStatus: {record['status']}"
+                    tk.Label(self.frame, text=details, justify="left", font=("Arial", 12)).pack(pady=5, anchor="w")
 
         tk.Button(self.frame, text="Back", command=lambda: self.load_patient_dashboard(username)).pack(pady=10)
-
 window = tk.Tk()
 PetServiceManagementSystem(window)
 window.mainloop()
