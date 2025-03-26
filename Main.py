@@ -274,46 +274,6 @@ class PetServiceManagementSystem:
             user_id = db.get_user_id(username)
             if not user_id:
                 raise ValueError("User not found.")
-            db.edit_pet(user_id, old_name, new_name, new_species, new_age, new_picture_path)
-            messagebox.showinfo("Success", "Pet details updated successfully!")
-            self.ManageMyPets(username)
-        except ValueError as ve:
-            messagebox.showerror("Input Error", str(ve))
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to update pet: {e}")
-
-    def AddPet(self, username):
-        self.clear_frame()
-        tk.Label(self.frame, text="Add Pet", font=("Arial", 20, "bold")).grid(row=0, column=0, columnspan=2, pady=10)
-        tk.Label(self.frame, text="Name").grid(row=1, column=0, padx=10, pady=5, sticky="w")
-        pet_name = tk.Entry(self.frame)
-        pet_name.grid(row=1, column=1, padx=10, pady=5)
-        tk.Label(self.frame, text="Species").grid(row=2, column=0, padx=10, pady=5, sticky="w")
-        species_options = ["Dog", "Cat"]
-        pet_species = Combobox(self.frame, values=species_options, state="readonly")
-        pet_species.grid(row=2, column=1, padx=10, pady=5)
-        tk.Label(self.frame, text="Age").grid(row=3, column=0, padx=10, pady=5, sticky="w")
-        pet_age = tk.Entry(self.frame)
-        pet_age.grid(row=3, column=1, padx=10, pady=5)
-        tk.Label(self.frame, text="Upload Picture").grid(row=4, column=0, padx=10, pady=5, sticky="w")
-        picture_path_label = tk.Label(self.frame, text="No file selected")
-        picture_path_label.grid(row=4, column=1, padx=10, pady=5)
-        upload_button = tk.Button(self.frame, text="Upload Picture", command=lambda: self.upload_picture(picture_path_label))
-        upload_button.grid(row=5, column=1, padx=10, pady=5)
-        save_button = tk.Button(self.frame,text="Save",font=("Arial", 12, "bold"),command=lambda: self.submit_pet(username, pet_name.get(), pet_species.get(), pet_age.get(), picture_path_label.cget("text")))
-        save_button.grid(row=6, column=0, padx=10, pady=10)
-        back_button = tk.Button(self.frame,text="Cancel",font=("Arial", 12, "bold"),command=lambda: self.ManageMyPets(username))
-        back_button.grid(row=6, column=1, padx=10, pady=10)
-
-    def upload_picture(self, picture_path_label):
-        file_path = filedialog.askopenfilename(title="Select Pet Picture",filetypes=[("Image Files", "*.png;*.jpg;*.jpeg")])
-        if file_path:
-            picture_path_label.config(text=file_path)
-            
-    def submit_pet(self, username, name, species, age, picture_path=None):
-        try:
-            if not all([username, name, species, age]):
-                raise ValueError("All fields are required.")
             age = int(age) if age.isdigit() else None
             if age is None:
                 raise ValueError("Age must be a number.")
