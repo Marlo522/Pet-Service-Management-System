@@ -550,6 +550,34 @@ class PetServiceManagementSystem:
         back_button = tk.Button(self.frame, text="Cancel", font=("Arial", 12, "bold"), command=lambda: self.ManageMyPets(username))
         back_button.grid(row=6, column=1, padx=10, pady=10)
 
+    def upload_picture(self, label):
+        """Open a file dialog to select a picture and update the label with the file path."""
+        file_path = filedialog.askopenfilename(
+            title="Select a Picture",
+            filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.bmp;*.gif")]
+        )
+        if file_path:
+            label.config(text=file_path)
+
+    def submit_pet(self, username, name, species, age, picture_path=None):
+        """Submit a new pet to the database."""
+        try:
+            if not all([username, name, species, age]):
+                raise ValueError("All fields are required.")
+            age = int(age) if age.isdigit() else None
+            if age is None:
+                raise ValueError("Age must be a number.")
+            user_id = db.get_user_id(username)
+            if not user_id:
+                raise ValueError("User not found.")
+            db.add_pet(user_id, name, species, age, picture_path)
+            messagebox.showinfo("Success", "Pet added successfully!")
+            self.ManageMyPets(username)
+        except ValueError as ve:
+            messagebox.showerror("Input Error", str(ve))
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to add pet: {e}")
+
 window = tk.Tk()
 PetServiceManagementSystem(window)
 window.mainloop()
