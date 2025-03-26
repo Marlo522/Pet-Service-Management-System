@@ -16,29 +16,6 @@ def connect_db():
     );
     """)
 
-    # Create Doctors Table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS doctors (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        specialty TEXT NOT NULL,
-        username TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
-    );
-    """)
-
-    # Create Appointments Table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS appointments (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        appointment_id INTEGER NOT NULL,
-        patient_name TEXT NOT NULL,
-        doctor TEXT NOT NULL,
-        date TEXT NOT NULL,
-        time TEXT NOT NULL,
-        status TEXT NOT NULL
-    );
-    """)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS pets (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,22 +49,22 @@ def connect_db():
         service_type TEXT NOT NULL,
         date TEXT NOT NULL,
         details TEXT,
+        status TEXT DEFAULT 'Pending',
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     );
     """)
-    
-
-    # Insert Predefined Doctor if Not Exists
-    cursor.execute("SELECT COUNT(*) FROM doctors WHERE username = ?", ("dr_marlo",))
-    if cursor.fetchone()[0] == 0:
-        cursor.execute("INSERT INTO doctors (name, specialty, username, password) VALUES (?, ?, ?, ?)",
-                       ("Dr. Marlo Veluz", "General Medicine", "dr_marlo", "marlo"))
-        conn.commit()
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS admin (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL
+    );
+    """)
 
     # Insert Predefined Admin Account if Not Exists
-    cursor.execute("SELECT COUNT(*) FROM users WHERE username = ?", ("admin",))
+    cursor.execute("SELECT COUNT(*) FROM admin WHERE username = ?", ("admin",))
     if cursor.fetchone()[0] == 0:
-        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", ("admin", "admin"))
+        cursor.execute("INSERT INTO admin (username, password) VALUES (?, ?)", ("admin", "admin"))
         conn.commit()
 
     conn.close()
@@ -178,23 +155,11 @@ def add_pet(user_id, name, species, age, picture_path=None):
         conn.close()
 
 def delete_pet(user_id, pet_name):
-    """Delete a pet by name for a specific user and its associated service history."""
+    """Delete a pet by name for a specific user."""
     try:
         conn = sqlite3.connect('Systemdb.db')
         cursor = conn.cursor()
-
-        # Delete service history associated with the pet
-        cursor.execute("""
-            DELETE FROM service_history
-            WHERE user_id = ? AND pet_name = ?
-        """, (user_id, pet_name))
-
-        # Delete the pet
-        cursor.execute("""
-            DELETE FROM pets
-            WHERE user_id = ? AND name = ?
-        """, (user_id, pet_name))
-
+        cursor.execute("DELETE FROM pets WHERE user_id = ? AND name = ?", (user_id, pet_name))
         conn.commit()
     finally:
         conn.close()
@@ -243,16 +208,18 @@ def get_all_pets():
 def add_grooming_service(user_id, pet_name, service_type, service_date, status='Pending'):
     """Add a grooming service booking to the database."""
     try:
-        with sqlite3.connect('Systemdb.db') as conn:
-            cursor = conn.cursor()
-            cursor.execute("""
-                INSERT INTO grooming_services (user_id, pet_name, service_type, service_date, status)
-                VALUES (?, ?, ?, ?, ?)
-            """, (user_id, pet_name, service_type, service_date, status))
-            conn.commit()
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO grooming_services (user_id, pet_name, service_type, service_date, status)
+            VALUES (?, ?, ?, ?, ?)
+        """, (user_id, pet_name, service_type, service_date, status))
+        conn.commit()
     except sqlite3.Error as e:
         print(f"Database error: {e}")  # Debugging output
         raise
+    finally:
+        conn.close()
 
 def get_grooming_appointments(username, status=None):
     """Retrieve all grooming appointments for a specific user with optional status filter."""
@@ -308,6 +275,31 @@ def add_service_history(user_id, pet_name, service_type, date, details=None, sta
             VALUES (?, ?, ?, ?, ?, ?)
         """, (user_id, pet_name, service_type, date, details, status))
         conn.commit()
+    finally:
+        conn.close()
+
+def get_all_grooming_appointments():
+    """Retrieve all grooming appointments for admin view."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, user_id, pet_name, service_type, service_date, status
+            FROM grooming_services
+            ORDER BY service_date DESC
+        """)
+        appointments = [
+            {
+                "id": row[0],
+                "user_id": row[1],
+                "pet_name": row[2],
+                "service_type": row[3],
+                "service_date": row[4],
+                "status": row[5]
+            }
+            for row in cursor.fetchall()
+        ]
+        return appointments
     finally:
         conn.close()
 
@@ -416,8 +408,102 @@ def get_all_service_history():
         return history
     finally:
         conn.close()
+def get_daycare_appointments(username, status=None):
+    """Retrieve all daycare appointments for a specific user with optional status filter."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+
+        # Get user ID from username
+        cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
+        user = cursor.fetchone()
+        if not user:
+            return []
+
+        user_id = user[0]
+
+        # Fetch daycare appointments for the user
+        query = """
+            SELECT id, pet_name, service_type, date, details
+            FROM service_history
+            WHERE user_id = ? AND service_type = 'Daycare' AND status = 'Pending'
+        """
+        params = [user_id]
+        if status:
+            query += " AND status = ?"
+            params.append(status)
+
+        cursor.execute(query, params)
+        appointments = [
+            {"id": row[0], "pet_name": row[1], "service_type": row[2], "date": row[3] , "details": row[4]}
+            for row in cursor.fetchall()
+        ]
+        return appointments
+    finally:
+        conn.close()
 
 
-
-
-
+def cancel_daycare_appointment(appointment_id):
+    """Cancel a daycare appointment by its ID."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM service_history WHERE id = ?", (appointment_id,))
+        conn.commit()
+    finally:
+        conn.close()
+def update_pet_name_in_service_history(user_id, old_name, new_name):
+    """Update the pet name in the service history table."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE service_history
+            SET pet_name = ?
+            WHERE user_id = ? AND pet_name = ?
+        """, (new_name, user_id, old_name))
+        conn.commit()
+    finally:
+        conn.close()
+        
+def update_pet_name_in_grooming_services(user_id, old_name, new_name):
+    """Update the pet name in the grooming services table."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE grooming_services
+            SET pet_name = ?
+            WHERE user_id = ? AND pet_name = ?
+        """, (new_name, user_id, old_name))
+        conn.commit()
+    finally:
+        conn.close()
+        
+def update_pet_name_in_daycare_services(user_id, old_name, new_name):
+    """Update the pet name in daycare services in the service history table."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE service_history
+            SET pet_name = ?
+            WHERE user_id = ? AND pet_name = ? AND service_type = 'Daycare'
+        """, (new_name, user_id, old_name))
+        conn.commit()
+    finally:
+        conn.close()
+        
+def update_grooming_status(appointment_id, new_status):
+    """Update the status of a grooming appointment."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE grooming_services
+            SET status = ?
+            WHERE id = ?
+        """, (new_status, appointment_id))
+        conn.commit()
+    finally:
+        conn.close()
