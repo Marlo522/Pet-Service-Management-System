@@ -70,7 +70,47 @@ class PetServiceManagementSystem:
         tk.Label(self.frame, text="Admin Dashboard", font=("Arial", 20, "bold")).pack(pady=10)
         tk.Button(self.frame, text="View All Users", font=("Arial", 12, "bold"), command=self.view_all_users).pack(pady=5)
         tk.Button(self.frame, text="View All Pets", font=("Arial", 12, "bold"), command=self.view_all_pets).pack(pady=5)
+        tk.Button(self.frame, text="Manage Service History", font=("Arial", 12, "bold"), command=self.manage_service_history).pack(pady=5)
         tk.Button(self.frame, text="Back", command=self.back_to_main).pack(pady=10)
+
+    def manage_service_history(self):
+        self.clear_frame()
+        tk.Label(self.frame, text="Manage Service History", font=("Arial", 20, "bold")).pack(pady=10)
+
+        history = db.get_all_service_history()
+        if history:
+            for record in history:
+                record_frame = tk.Frame(self.frame, borderwidth=1, relief="solid", padx=10, pady=10)
+                record_frame.pack(fill=tk.X, padx=10, pady=5)
+
+                details = (
+                    f"ID: {record['id']}\n"
+                    f"Pet: {record['pet_name']}\n"
+                    f"Service: {record['service_type']}\n"
+                    f"Date: {record['date']}\n"
+                    f"Details: {record['details']}\n"
+                    f"Status: {record['status']}"
+                )
+                tk.Label(record_frame, text=details, justify="left", font=("Arial", 12)).pack(side=tk.LEFT, padx=10)
+
+                if record["status"] == "Pending":
+                    tk.Button(
+                        record_frame,
+                        text="Mark as Done",
+                        command=lambda record_id=record['id']: self.update_service_status(record_id)
+                    ).pack(side=tk.RIGHT, padx=10)
+        else:
+            tk.Label(self.frame, text="No service history found.", font=("Arial", 12)).pack(pady=10)
+
+        tk.Button(self.frame, text="Back", command=self.load_admin_dashboard).pack(pady=10)
+
+    def update_service_status(self, record_id):
+        try:
+            db.update_service_status(record_id, "Done")
+            messagebox.showinfo("Success", "Service status updated to 'Done'!")
+            self.manage_service_history()
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to update status: {e}")
 
     def view_all_users(self):
         self.clear_frame()
@@ -469,31 +509,38 @@ class PetServiceManagementSystem:
 
         history = db.get_service_history(user_id)
         if history:
-            # Separate Grooming Services
-            tk.Label(self.frame, text="Grooming Services", font=("Arial", 16, "bold")).pack(pady=10, anchor="w")
-            grooming_found = False
             for record in history:
-                if record["service_type"] == "Grooming":
-                    grooming_found = True
-                    details = f"Pet: {record['pet_name']}\nDate: {record['date']}\nDetails: {record['details']}"
-                    tk.Label(self.frame, text=details, justify="left", font=("Arial", 12)).pack(pady=5, anchor="w")
-            if not grooming_found:
-                tk.Label(self.frame, text="No grooming services found.", font=("Arial", 12)).pack(pady=5, anchor="w")
+                record_frame = tk.Frame(self.frame, borderwidth=1, relief="solid", padx=10, pady=10)
+                record_frame.pack(fill=tk.X, padx=10, pady=5)
 
-            # Separate Daycare Services
-            tk.Label(self.frame, text="Daycare Services", font=("Arial", 16, "bold")).pack(pady=10, anchor="w")
-            daycare_found = False
-            for record in history:
-                if record["service_type"] == "Daycare":
-                    daycare_found = True
-                    details = f"Pet: {record['pet_name']}\nDate: {record['date']}\nDetails: {record['details']}"
-                    tk.Label(self.frame, text=details, justify="left", font=("Arial", 12)).pack(pady=5, anchor="w")
-            if not daycare_found:
-                tk.Label(self.frame, text="No daycare services found.", font=("Arial", 12)).pack(pady=5, anchor="w")
+                details = (
+                    f"Pet: {record['pet_name']}\n"
+                    f"Service: {record['service_type']}\n"
+                    f"Date: {record['date']}\n"
+                    f"Details: {record['details']}\n"
+                    f"Status: {record['status']}"
+                )
+                tk.Label(record_frame, text=details, justify="left", font=("Arial", 12)).pack(side=tk.LEFT, padx=10)
+
+                if username == "admin":  # Allow admin to update status
+                    tk.Button(
+                        record_frame,
+                        text="Update Status",
+                        command=lambda record_id=record['id']: self.update_service_status(record_id)
+                    ).pack(side=tk.RIGHT, padx=10)
         else:
             tk.Label(self.frame, text="No service history found.", font=("Arial", 12)).pack(pady=10)
 
         tk.Button(self.frame, text="Back", command=lambda: self.load_patient_dashboard(username)).pack(pady=10)
+
+    def update_service_status(self, record_id):
+        new_status = simpledialog.askstring("Update Status", "Enter new status (Pending/Done):")
+        if new_status in ["Pending", "Done"]:
+            db.update_service_status(record_id, new_status)
+            messagebox.showinfo("Success", "Service status updated successfully!")
+            self.load_admin_dashboard()
+        else:
+            messagebox.showerror("Error", "Invalid status. Please enter 'Pending' or 'Done'.")
 
 window = tk.Tk()
 PetServiceManagementSystem(window)
