@@ -555,13 +555,12 @@ class PetServiceManagementSystem:
         tk.Button(self.frame, text="Back", command=lambda: self.load_patient_dashboard(username)).pack(pady=10)
 
     def update_service_status(self, record_id):
-        new_status = simpledialog.askstring("Update Status", "Enter new status (Pending/Done):")
-        if new_status in ["Pending", "Done"]:
-            db.update_service_status(record_id, new_status)
-            messagebox.showinfo("Success", "Service status updated successfully!")
-            self.load_admin_dashboard()
-        else:
-            messagebox.showerror("Error", "Invalid status. Please enter 'Pending' or 'Done'.")
+        try:
+            db.update_service_status(record_id, "Done")
+            messagebox.showinfo("Success", "Service status updated to 'Done'!")
+            self.ServiceHistory("admin")  # Reload the service history for admin
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to update status: {e}")
 
 window = tk.Tk()
 PetServiceManagementSystem(window)
