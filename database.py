@@ -243,18 +243,16 @@ def get_all_pets():
 def add_grooming_service(user_id, pet_name, service_type, service_date, status='Pending'):
     """Add a grooming service booking to the database."""
     try:
-        conn = sqlite3.connect('Systemdb.db')
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO grooming_services (user_id, pet_name, service_type, service_date, status)
-            VALUES (?, ?, ?, ?, ?)
-        """, (user_id, pet_name, service_type, service_date, status))
-        conn.commit()
+        with sqlite3.connect('Systemdb.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO grooming_services (user_id, pet_name, service_type, service_date, status)
+                VALUES (?, ?, ?, ?, ?)
+            """, (user_id, pet_name, service_type, service_date, status))
+            conn.commit()
     except sqlite3.Error as e:
         print(f"Database error: {e}")  # Debugging output
         raise
-    finally:
-        conn.close()
 
 def get_grooming_appointments(username, status=None):
     """Retrieve all grooming appointments for a specific user with optional status filter."""
