@@ -51,7 +51,7 @@ def connect_db():
     );
     """)
 
-    # Create Service History Table with status column
+    # Create Service History Table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS service_history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,6 +64,7 @@ def connect_db():
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     );
     """)
+    
 
     # Add status column if it doesn't exist
     cursor.execute("PRAGMA table_info(service_history)")
@@ -222,106 +223,84 @@ def get_all_pets():
         return pets
     finally:
         conn.close()
+        
+def add_grooming_service(user_id, pet_name, service_type, service_date, status='Pending'):
+    """Add a grooming service booking to the database."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO grooming_services (user_id, pet_name, service_type, service_date, status)
+            VALUES (?, ?, ?, ?, ?)
+        """, (user_id, pet_name, service_type, service_date, status))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")  # Debugging output
+        raise
+    finally:
+        conn.close()
 
-def add_service_history(user_id, pet_name, service_type, date, details=None):
+def get_grooming_appointments(username, status=None):
+    """Retrieve all grooming appointments for a specific user with optional status filter."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+
+        # Get user ID from username
+        cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
+        user = cursor.fetchone()
+        if not user:
+            return []
+
+        user_id = user[0]
+
+        # Fetch grooming appointments for the user
+        query = """
+            SELECT id, pet_name, service_type, service_date
+            FROM grooming_services
+            WHERE user_id = ? AND status = 'Pending'
+        """
+        params = [user_id]
+        if status:
+            query += " AND status = ?"
+            params.append(status)
+
+        cursor.execute(query, params)
+        appointments = [
+            {"id": row[0], "pet_name": row[1], "service_type": row[2], "service_date": row[3]}
+            for row in cursor.fetchall()
+        ]
+        return appointments
+    finally:
+        conn.close()
+
+def cancel_grooming_appointment(appointment_id):
+    """Cancel a grooming appointment by its ID."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM grooming_services WHERE id = ?", (appointment_id,))
+        conn.commit()
+    finally:
+        conn.close()
+
+def add_service_history(user_id, pet_name, service_type, date, details=None, status='Pending'):
     """Add a record to the service history."""
     try:
         conn = sqlite3.connect('Systemdb.db')
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO service_history (user_id, pet_name, service_type, date, details)
-            VALUES (?, ?, ?, ?, ?)
-        """, (user_id, pet_name, service_type, date, details))
-        conn.commit()
-    finally:
-        conn.close()
-
-def get_service_history(user_id):
-    """Retrieve all service history for a specific user."""
-    try:
-        conn = sqlite3.connect('Systemdb.db')
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT id, pet_name, service_type, date, details, status
+            SELECT pet_name, service_type, date, details
             FROM service_history
-            WHERE user_id = ?
+            WHERE user_id = ? AND service_type = 'Daycare' AND status = 'Done'
             ORDER BY date DESC
         """, (user_id,))
-        history = [
-            {
-                "id": row[0],
-                "pet_name": row[1],
-                "service_type": row[2],
-                "date": row[3],
-                "details": row[4],
-                "status": row[5]
-            }
-            for row in cursor.fetchall()
-        ]
+        history = [{"pet_name": row[0], "service_type": row[1], "date": row[2], "details": row[3]} for row in cursor.fetchall()]
         return history
     finally:
         conn.close()
 
-def update_service_status(record_id, new_status):
-    """Update the status of a service record."""
-    try:
-        conn = sqlite3.connect('Systemdb.db')
-        cursor = conn.cursor()
-        cursor.execute("""
-            UPDATE service_history
-            SET status = ?
-            WHERE id = ?
-        """, (new_status, record_id))
-        conn.commit()
-    finally:
-        conn.close()
+    
 
-def get_all_pets_with_owners():
-    """Retrieve all pets with their owner's name and details."""
-    try:
-        conn = sqlite3.connect('Systemdb.db')
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT pets.name, pets.species, pets.age, pets.picture_path, users.id AS user_id, users.username AS owner_name
-            FROM pets
-            JOIN users ON pets.user_id = users.id
-        """)
-        pets = [
-            {
-                "name": row[0],
-                "species": row[1],
-                "age": row[2],
-                "picture_path": row[3],
-                "user_id": row[4],
-                "owner_name": row[5]
-            }
-            for row in cursor.fetchall()
-        ]
-        return pets
-    finally:
-        conn.close()
 
-def get_all_service_history():
-    """Retrieve all service history for admin view."""
-    try:
-        conn = sqlite3.connect('Systemdb.db')
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT id, pet_name, service_type, date, details, status
-            FROM service_history
-            ORDER BY date DESC
-        """)
-        history = [
-            {
-                "id": row[0],
-                "pet_name": row[1],
-                "service_type": row[2],
-                "date": row[3],
-                "details": row[4],
-                "status": row[5]
-            }
-            for row in cursor.fetchall()
-        ]
-        return history
-    finally:
-        conn.close()
+
