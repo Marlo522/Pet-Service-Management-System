@@ -50,8 +50,20 @@ def connect_db():
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     );
     """)
+    
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS grooming_services (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        pet_name TEXT NOT NULL,
+        service_type TEXT NOT NULL,
+        service_date TEXT NOT NULL,
+        status TEXT DEFAULT 'Pending',
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    );
+    """)
 
-    # Create Service History Table
+    # Create Service History Table with status column
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS service_history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -290,17 +302,120 @@ def add_service_history(user_id, pet_name, service_type, date, details=None, sta
         conn = sqlite3.connect('Systemdb.db')
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT pet_name, service_type, date, details
+            INSERT INTO service_history (user_id, pet_name, service_type, date, details, status)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (user_id, pet_name, service_type, date, details, status))
+        conn.commit()
+    finally:
+        conn.close()
+
+def get_grooming_services_done(user_id):
+    """Retrieve all grooming services with status 'Done' for a specific user."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, pet_name, service_type, date, details, status
             FROM service_history
-            WHERE user_id = ? AND service_type = 'Daycare' AND status = 'Done'
+            WHERE user_id = ?
             ORDER BY date DESC
         """, (user_id,))
-        history = [{"pet_name": row[0], "service_type": row[1], "date": row[2], "details": row[3]} for row in cursor.fetchall()]
+        history = [
+            {
+                "id": row[0],
+                "pet_name": row[1],
+                "service_type": row[2],
+                "date": row[3],
+                "details": row[4],
+                "status": row[5]
+            }
+            for row in cursor.fetchall()
+        ]
         return history
     finally:
         conn.close()
 
-    
+def update_service_status(record_id, new_status):
+    """Update the status of a service record."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE service_history
+            SET status = ?
+            WHERE id = ?
+        """, (new_status, record_id))
+        conn.commit()
+    finally:
+        conn.close()
+
+def get_all_pets_with_owners():
+    """Retrieve all pets with their owner's name and details."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT pets.name, pets.species, pets.age, pets.picture_path, users.id AS user_id, users.username AS owner_name
+            FROM pets
+            JOIN users ON pets.user_id = users.id
+        """)
+        pets = [
+            {
+                "name": row[0],
+                "species": row[1],
+                "age": row[2],
+                "picture_path": row[3],
+                "user_id": row[4],
+                "owner_name": row[5]
+            }
+            for row in cursor.fetchall()
+        ]
+        return pets
+    finally:
+        conn.close()
+
+def get_all_service_history():
+    """Retrieve all service history for admin view."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, pet_name, service_type, date, details, status
+            FROM service_history
+            ORDER BY date DESC
+        """)
+        history = [
+            {
+                "id": row[0],
+                "pet_name": row[1],
+                "service_type": row[2],
+                "date": row[3],
+                "details": row[4],
+                "status": row[5]
+            }
+            for row in cursor.fetchall()
+        ]
+        return history
+    finally:
+        conn.close()
+
+def get_daycare_services_done(user_id):
+    """Retrieve all daycare services with status 'Done' for a specific user."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        query = """
+            SELECT pet_name, service_type, date, details
+            FROM service_history
+            WHERE user_id = ? AND service_type = 'Daycare' AND status = 'Done'
+            ORDER BY date DESC
+        """
+        cursor.execute(query, (user_id,))
+        return [{"pet_name": row[0], "service_type": row[1], "date": row[2], "details": row[3]} for row in cursor.fetchall()]
+    finally:
+        conn.close()
+
+
 
 
 
