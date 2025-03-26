@@ -178,11 +178,23 @@ def add_pet(user_id, name, species, age, picture_path=None):
         conn.close()
 
 def delete_pet(user_id, pet_name):
-    """Delete a pet by name for a specific user."""
+    """Delete a pet by name for a specific user and its associated service history."""
     try:
         conn = sqlite3.connect('Systemdb.db')
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM pets WHERE user_id = ? AND name = ?", (user_id, pet_name))
+
+        # Delete service history associated with the pet
+        cursor.execute("""
+            DELETE FROM service_history
+            WHERE user_id = ? AND pet_name = ?
+        """, (user_id, pet_name))
+
+        # Delete the pet
+        cursor.execute("""
+            DELETE FROM pets
+            WHERE user_id = ? AND name = ?
+        """, (user_id, pet_name))
+
         conn.commit()
     finally:
         conn.close()
