@@ -13,14 +13,22 @@ class PetServiceManagementSystem:
     def __init__(self, window):
         self.window = window
         self.window.title("PET SERVICE MANAGEMENT SYSTEM")
-        self.window.geometry("1000x800")
+        self.window.geometry("900x700")
+        self.window.configure(bg="#B7D8E6")
 
-        tk.Label(window, text="Pet Service Management System", font=("Arial", 20)).pack()
-        self.frame = tk.Frame(self.window)
+        tk.Label(window, text="Pet Service Management System", font=("Bebas Neue", 30),bg="#B7D8E6",fg="white", pady=20).pack()
+        self.frame = tk.Frame(self.window, bg="#B7D8E6")
         self.frame.pack()
+        
+        button_style = {
+            "bg": "#45A29E",  # Sand color
+            "fg": "black",
+            "font": ("Arial", 14),
+            "width": 20,  # Equal width for buttons
+        }
 
-        tk.Button(self.frame, text="User", command=self.User).grid(row=0, column=0, padx=5, pady=5)
-        tk.Button(self.frame, text="Admin", command=self.Doctor).grid(row=0, column=1, padx=5, pady=5)
+        tk.Button(self.frame, text="User", command=self.User, **button_style).grid(row=0, column=0, padx=5, pady=5)
+        tk.Button(self.frame, text="Admin", command=self.Doctor, **button_style).grid(row=0, column=1, padx=5, pady=5)
 
         self.appointments = []
 
@@ -38,18 +46,18 @@ class PetServiceManagementSystem:
 
     def User(self):
         self.clear_frame()
-        tk.Label(self.frame, text="User Login").grid(row=0, column=0, padx=5, pady=5, columnspan=3)
+        tk.Label(self.frame, text="User Login", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").grid(row=0, column=0, padx=5, pady=20, columnspan=3)
         tk.Button(self.frame, text="Login", command=self.UserLogIn).grid(row=1, column=1, padx=5, pady=5)
         tk.Button(self.frame, text="Create Account", command=self.UserRegister).grid(row=1, column=2, padx=5, pady=5)
         tk.Button(self.frame, text="Back", command=self.back_to_main).grid(row=2, column=1, padx=5, pady=5)
 
     def Doctor(self):
         self.clear_frame()
-        tk.Label(self.frame, text="Admin Login", font=("Arial", 20, "bold")).grid(row=0, column=0, columnspan=2, pady=10)
-        tk.Label(self.frame, text="Username").grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(self.frame, text="Admin Login", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").grid(row=0, column=0, columnspan=2, pady=20)
+        tk.Label(self.frame, text="Username", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=1, column=0, padx=10, pady=5, sticky="w")
         admin_username = tk.Entry(self.frame)
         admin_username.grid(row=1, column=1, padx=10, pady=5)
-        tk.Label(self.frame, text="Password").grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(self.frame, text="Password", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=2, column=0, padx=10, pady=5, sticky="w")
         admin_password = tk.Entry(self.frame, show="*")
         admin_password.grid(row=2, column=1, padx=10, pady=5)
         tk.Button(self.frame, text="Login", font=("Arial", 12, "bold"),
@@ -65,7 +73,7 @@ class PetServiceManagementSystem:
 
     def load_admin_dashboard(self):
         self.clear_frame()
-        tk.Label(self.frame, text="Admin Dashboard", font=("Arial", 20, "bold")).pack(pady=10)
+        tk.Label(self.frame, text="Admin Dashboard", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").pack(pady=20)
         tk.Button(self.frame, text="Manage Users", font=("Arial", 12, "bold"), command=self.view_all_users).pack(pady=5)
         tk.Button(self.frame, text="Manage Pets", font=("Arial", 12, "bold"), command=self.view_all_pets).pack(pady=5)
         tk.Button(self.frame, text="Manage Grooming Appointments", font=("Arial", 12, "bold"), command=self.manage_grooming_appointments).pack(pady=5)
@@ -75,7 +83,7 @@ class PetServiceManagementSystem:
         
     def load_user_dashboard(self, username):
         self.clear_frame()
-        tk.Label(self.frame, text=f"Welcome, {username}", font=("Arial", 20, "bold")).pack(pady=10)
+        tk.Label(self.frame, text=f"Welcome, {username}", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").pack(pady=20)
         tk.Button(self.frame, text="Manage My Pets", font=("Arial", 12, "bold"), command=lambda: self.ManageMyPets(username)).pack(pady=5)
         tk.Button(self.frame, text="Grooming Services", font=("Arial", 12, "bold"), command=lambda: self.GroomingServices(username)).pack(pady=5)
         tk.Button(self.frame, text="Daycare", font=("Arial", 12, "bold"), command=lambda: self.Daycare(username)).pack(pady=5)
@@ -84,7 +92,7 @@ class PetServiceManagementSystem:
 
     def manage_service_history(self):
         self.clear_frame()
-        tk.Label(self.frame, text="Manage Service History", font=("Arial", 20, "bold")).pack(pady=10)
+        tk.Label(self.frame, text="Manage Service History", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").pack(pady=20)
 
         history = db.get_all_service_history()
         if history:
@@ -100,7 +108,7 @@ class PetServiceManagementSystem:
                     f"Details: {record['details']}\n"
                     f"Status: {record['status']}"
                 )
-                tk.Label(record_frame, text=details, justify="left", font=("Arial", 12)).pack(side=tk.LEFT, padx=10)
+                tk.Label(record_frame, text=details, justify="left", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(side=tk.LEFT, padx=10)
 
                 if record["status"] == "Pending":
                     tk.Button(
@@ -109,13 +117,13 @@ class PetServiceManagementSystem:
                         command=lambda record_id=record['id']: self.update_service_status(record_id)
                     ).pack(side=tk.RIGHT, padx=10)
         else:
-            tk.Label(self.frame, text="No service history found.", font=("Arial", 12)).pack(pady=10)
+            tk.Label(self.frame, text="No service history found.", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=10)
 
         tk.Button(self.frame, text="Back", command=self.load_admin_dashboard).pack(pady=10)
         
     def manage_grooming_appointments(self):
         self.clear_frame()
-        tk.Label(self.frame, text="Manage Grooming Appointments", font=("Arial", 20, "bold")).pack(pady=10)
+        tk.Label(self.frame, text="Manage Grooming Appointments", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").pack(pady=20)
 
     # Fetch all grooming appointments with status = 'Pending'
         appointments = db.get_all_grooming_appointments()
@@ -134,7 +142,7 @@ class PetServiceManagementSystem:
                 f"Date: {appointment['service_date']}\n"
                 f"Status: {appointment['status']}"
             )
-                tk.Label(appointment_frame, text=details, justify="left", font=("Arial", 12)).pack(side=tk.LEFT, padx=10)
+                tk.Label(appointment_frame, text=details, justify="left", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(side=tk.LEFT, padx=10)
 
             # Add a button to mark the appointment as "Done"
                 tk.Button(
@@ -166,33 +174,33 @@ class PetServiceManagementSystem:
 
     def view_all_users(self):
         self.clear_frame()
-        tk.Label(self.frame, text="All Users", font=("Arial", 20, "bold")).pack(pady=10)
+        tk.Label(self.frame, text="All Users", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").pack(pady=20)
         users = db.get_all_users()
         if users:
             for user in users:
-                tk.Label(self.frame, text=f"ID: {user['id']}, Username: {user['username']}").pack(pady=5)
+                tk.Label(self.frame, text=f"ID: {user['id']}, Username: {user['username']}", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
         else:
-            tk.Label(self.frame, text="No users found.").pack(pady=5)
+            tk.Label(self.frame, text="No users found.", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
         tk.Button(self.frame, text="Back", command=self.load_admin_dashboard).pack(pady=10)
 
     def view_all_pets(self):
         self.clear_frame()
-        tk.Label(self.frame, text="All Pets", font=("Arial", 20, "bold")).pack(pady=10)
+        tk.Label(self.frame, text="All Pets", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").pack(pady=20)
         pets = db.get_all_pets()
         if pets:
             for pet in pets:
-                tk.Label(self.frame, text=f"Name: {pet['name']}, Species: {pet['species']}, Owner ID: {pet['user_id']}").pack(pady=5)
+                tk.Label(self.frame, text=f"Name: {pet['name']}, Species: {pet['species']}, Owner ID: {pet['user_id']}", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
         else:
-            tk.Label(self.frame, text="No pets found.").pack(pady=5)
+            tk.Label(self.frame, text="No pets found.", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
         tk.Button(self.frame, text="Back", command=self.load_admin_dashboard).pack(pady=10)
 
     def UserLogIn(self):
         self.clear_frame()
-        tk.Label(self.frame, text="Login").grid(row=0, column=0, padx=5, pady=5, columnspan=2)
-        tk.Label(self.frame, text="Username").grid(row=1, column=0, padx=5, pady=5)
+        tk.Label(self.frame, text="Login", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").grid(row=0, column=0, padx=5, pady=5, columnspan=2)
+        tk.Label(self.frame, text="Username", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=1, column=0, padx=5, pady=5)
         username_entry = tk.Entry(self.frame)
         username_entry.grid(row=1, column=1, padx=5, pady=5)
-        tk.Label(self.frame, text="Password").grid(row=2, column=0, padx=5, pady=5)
+        tk.Label(self.frame, text="Password", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=2, column=0, padx=5, pady=5)
         password_entry = tk.Entry(self.frame, show="*")
         password_entry.grid(row=2, column=1, padx=5, pady=5)
         tk.Button(self.frame, text="Login", command=lambda: self.Login(username_entry.get(), password_entry.get())).grid(row=3, column=0, padx=5, pady=5)
@@ -200,11 +208,11 @@ class PetServiceManagementSystem:
 
     def UserRegister(self):
         self.clear_frame()
-        tk.Label(self.frame, text="Register").grid(row=0, column=0, padx=5, pady=5, columnspan=2)
-        tk.Label(self.frame, text="Username").grid(row=1, column=0, padx=5, pady=5)
+        tk.Label(self.frame, text="Register", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").grid(row=0, column=0, padx=5, pady=20, columnspan=2)
+        tk.Label(self.frame, text="Username",font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=1, column=0, padx=5, pady=5)
         username_entry = tk.Entry(self.frame)
         username_entry.grid(row=1, column=1, padx=5, pady=5)
-        tk.Label(self.frame, text="Password").grid(row=2, column=0, padx=5, pady=5)
+        tk.Label(self.frame, text="Password", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=2, column=0, padx=5, pady=5)
         password_entry = tk.Entry(self.frame, show="*")
         password_entry.grid(row=2, column=1, padx=5, pady=5)
         tk.Button(self.frame, text="Register", command=lambda: self.Register(username_entry.get(), password_entry.get())).grid(row=3, column=0, padx=5, pady=5)
@@ -237,7 +245,7 @@ class PetServiceManagementSystem:
     
     def ManageMyPets(self, username):
         self.clear_frame()
-        tk.Label(self.frame, text="Manage My Pets", font=("Arial", 20, "bold")).pack(pady=10)
+        tk.Label(self.frame, text="Manage My Pets", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").pack(pady=20)
 
         pets = db.get_user_pets(username)
         if pets:
@@ -247,7 +255,7 @@ class PetServiceManagementSystem:
 
                 # Display pet details
                 details = f"Name: {pet['name']}\nSpecies: {pet['species']}\nAge: {pet['age']}"
-                tk.Label(pet_frame, text=details, justify="left").pack(side=tk.LEFT, padx=10)
+                tk.Label(pet_frame, text=details, justify="left", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(side=tk.LEFT, padx=10)
 
                 # Display pet image
                 try:
@@ -258,16 +266,16 @@ class PetServiceManagementSystem:
                         image_label.image = image  # Keep a reference to avoid garbage collection
                         image_label.pack(side=tk.RIGHT, padx=10)
                     else:
-                        tk.Label(pet_frame, text="No Image").pack(side=tk.RIGHT, padx=10)
+                        tk.Label(pet_frame, text="No Image", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(side=tk.RIGHT, padx=10)
                 except Exception as e:
                     print(f"Error loading image: {e}")
-                    tk.Label(pet_frame, text="Error Displaying Image").pack(side=tk.RIGHT, padx=10)
+                    tk.Label(pet_frame, text="Error Displaying Image", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(side=tk.RIGHT, padx=10)
 
                 # Add Edit and Delete buttons
                 tk.Button(pet_frame, text="Edit", command=lambda pet=pet: self.EditPet(username, pet)).pack(side=tk.RIGHT, padx=5)
                 tk.Button(pet_frame, text="Delete", command=lambda pet=pet: self.DeletePet(username, pet['name'])).pack(side=tk.RIGHT, padx=5)
         else:
-            tk.Label(self.frame, text="No pets registered yet.").pack(pady=5)
+            tk.Label(self.frame, text="No pets registered yet.", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
 
         tk.Button(self.frame, text="Add Pet", font=("Arial", 12, "bold"), command=lambda: self.AddPet(username)).pack(pady=5)
         tk.Button(self.frame, text="Back", command=lambda: self.load_user_dashboard(username)).pack(pady=10)
@@ -285,22 +293,22 @@ class PetServiceManagementSystem:
 
     def EditPet(self, username, pet):
         self.clear_frame()
-        tk.Label(self.frame, text="Edit Pet", font=("Arial", 20, "bold")).grid(row=0, column=0, columnspan=2, pady=10)
-        tk.Label(self.frame, text="Name").grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(self.frame, text="Edit Pet", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").grid(row=0, column=0, columnspan=2, pady=20)
+        tk.Label(self.frame, text="Name", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=1, column=0, padx=10, pady=5, sticky="w")
         pet_name = tk.Entry(self.frame)
         pet_name.insert(0, pet['name'])
         pet_name.grid(row=1, column=1, padx=10, pady=5)
-        tk.Label(self.frame, text="Species").grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(self.frame, text="Species", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=2, column=0, padx=10, pady=5, sticky="w")
         species_options = ["Dog", "Cat"]
         pet_species = Combobox(self.frame, values=species_options, state="readonly")
         pet_species.set(pet['species'])
         pet_species.grid(row=2, column=1, padx=10, pady=5)
-        tk.Label(self.frame, text="Age").grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(self.frame, text="Age", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=3, column=0, padx=10, pady=5, sticky="w")
         pet_age = tk.Entry(self.frame)
         pet_age.insert(0, pet['age'])
         pet_age.grid(row=3, column=1, padx=10, pady=5)
-        tk.Label(self.frame, text="Upload Picture").grid(row=4, column=0, padx=10, pady=5, sticky="w")
-        picture_path_label = tk.Label(self.frame, text=pet['picture_path'] or "No file selected")
+        tk.Label(self.frame, text="Upload Picture", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=4, column=0, padx=10, pady=5, sticky="w")
+        picture_path_label = tk.Label(self.frame, text=pet['picture_path'] or "No file selected", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white")
         picture_path_label.grid(row=4, column=1, padx=10, pady=5)
         upload_button = tk.Button(self.frame, text="Upload Picture", command=lambda: self.upload_picture(picture_path_label))
         upload_button.grid(row=5, column=1, padx=10, pady=5)
@@ -344,31 +352,31 @@ class PetServiceManagementSystem:
 
     def GroomingServices(self, username):
         self.clear_frame()
-        tk.Label(self.frame, text="Grooming Services", font=("Arial", 20, "bold")).grid(row=0, column=0, columnspan=2, pady=10)
+        tk.Label(self.frame, text="Grooming Services",font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").grid(row=0, column=0, columnspan=2, pady=20)
 
     # Fetch user's pets
         pets = db.get_user_pets(username)
         if not pets:
-            tk.Label(self.frame, text="No pets registered. Please add a pet first.", font=("Arial", 12)).grid(row=1, column=0, columnspan=2, pady=10)
+            tk.Label(self.frame, text="No pets registered. Please add a pet first.", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=1, column=0, columnspan=2, pady=10)
             tk.Button(self.frame, text="Back", command=lambda: self.load_user_dashboard(username)).grid(row=2, column=0, columnspan=2, pady=10)
             return
 
     # Pet selection dropdown
-        tk.Label(self.frame, text="Select Pet:", font=("Arial", 12)).grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(self.frame, text="Select Pet:", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=3, column=0, padx=10, pady=5, sticky="w")
         pet_options = [pet["name"] for pet in pets]
         selected_pet = tk.StringVar()
         pet_dropdown = ttk.Combobox(self.frame, values=pet_options, textvariable=selected_pet, state="readonly")
         pet_dropdown.grid(row=3, column=1, padx=10, pady=5, sticky="w")
 
     # Grooming services radio buttons
-        tk.Label(self.frame, text="Select Service:", font=("Arial", 12)).grid(row=4, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(self.frame, text="Select Service:", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=4, column=0, padx=10, pady=5, sticky="w")
         selected_service = tk.StringVar()
         services = ["Basic Grooming", "Full Grooming", "Nail Clipping", "Ear Cleaning", "Bath & Blow Dry"]
         for i, service in enumerate(services):
             tk.Radiobutton(self.frame, text=service, variable=selected_service, value=service).grid(row=5 + i, column=0, padx=10, pady=2, sticky="w")
 
     # Date selection dropdown
-        tk.Label(self.frame, text="Select Date:", font=("Arial", 12)).grid(row=4, column=1, padx=10, pady=5, sticky="w")
+        tk.Label(self.frame, text="Select Date:", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=4, column=1, padx=10, pady=5, sticky="w")
         available_dates = ["2025-03-25", "2025-03-26", "2025-03-27", "2025-03-28"]  # Example dates
         selected_date = tk.StringVar(value=available_dates[0])
         date_dropdown = ttk.Combobox(self.frame, textvariable=selected_date, values=available_dates, state="readonly")
@@ -378,18 +386,18 @@ class PetServiceManagementSystem:
         tk.Button(self.frame,text="Book Service",font=("Arial", 12, "bold"),command=lambda: self.book_grooming(username, selected_pet.get(), selected_service.get(), selected_date.get())).grid(row=10, column=0, columnspan=2, pady=10)
 
     # My grooming appointments
-        tk.Label(self.frame, text="My Grooming Appointments", font=("Arial", 16, "bold")).grid(row=11, column=0, columnspan=2, pady=10)
+        tk.Label(self.frame, text="My Grooming Appointments", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").grid(row=11, column=0, columnspan=2, pady=20)
         appointments = db.get_grooming_appointments(username, status="Pending")  # Fetch only pending appointments
         if appointments:
             for i, appointment in enumerate(appointments):
-                tk.Label(self.frame, text=f"{i + 1}. {appointment['pet_name']} - {appointment['service_type']} - {appointment['service_date']}").grid(row=12 + i, column=0, padx=10, pady=5, sticky="w")
+                tk.Label(self.frame, text=f"{i + 1}. {appointment['pet_name']} - {appointment['service_type']} - {appointment['service_date']}", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=12 + i, column=0, padx=10, pady=5, sticky="w")
                 tk.Button(
                 self.frame,
                 text="Cancel",
                 command=lambda appointment_id=appointment['id']: self.cancel_grooming(username, appointment_id)
             ).grid(row=12 + i, column=1, padx=10, pady=5)
         else:
-            tk.Label(self.frame, text="No grooming appointments found.").grid(row=12, column=0, columnspan=2, pady=5)
+            tk.Label(self.frame, text="No grooming appointments found.", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=12, column=0, columnspan=2, pady=5)
 
     # Back button
         tk.Button(self.frame, text="Back", font=("Arial", 12, "bold"), command=lambda: self.load_user_dashboard(username)).grid(row=20, column=0, columnspan=2, pady=10)
@@ -431,29 +439,29 @@ class PetServiceManagementSystem:
 
     def Daycare(self, username):
         self.clear_frame()
-        tk.Label(self.frame, text="Daycare Booking", font=("Arial", 20, "bold")).pack(pady=10)
+        tk.Label(self.frame, text="Daycare Booking",font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").pack(pady=20)
 
     # Fetch user's pets
         pets = db.get_user_pets(username)
         if not pets:
-            tk.Label(self.frame, text="No pets registered. Please add a pet first.", font=("Arial", 12)).pack(pady=10)
+            tk.Label(self.frame, text="No pets registered. Please add a pet first.", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=10)
             tk.Button(self.frame, text="Back", command=lambda: self.load_user_dashboard(username)).pack(pady=10)
             return
 
     # Pet selection dropdown
-        tk.Label(self.frame, text="Select Pet:", font=("Arial", 12)).pack(pady=5)
+        tk.Label(self.frame, text="Select Pet:", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
         pet_names = [pet["name"] for pet in pets]
         selected_pet = tk.StringVar()
         pet_dropdown = Combobox(self.frame, textvariable=selected_pet, values=pet_names, state="readonly")
         pet_dropdown.pack(pady=5)
 
     # Date selection using Calendar
-        tk.Label(self.frame, text="Select Date:", font=("Arial", 12)).pack(pady=5)
+        tk.Label(self.frame, text="Select Date:", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
         calendar = Calendar(self.frame, selectmode="day")
         calendar.pack(pady=5)
 
     # Drop-off time
-        tk.Label(self.frame, text="Drop-off Time:", font=("Arial", 12)).pack(pady=5)
+        tk.Label(self.frame, text="Drop-off Time:", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
         drop_off_frame = tk.Frame(self.frame)
         drop_off_frame.pack(pady=5)
         drop_off_hour = Combobox(drop_off_frame, values=[f"{i:02}" for i in range(1, 13)], width=5, state="readonly")
@@ -467,7 +475,7 @@ class PetServiceManagementSystem:
         drop_off_ampm.grid(row=0, column=2, padx=2)
 
     # Pick-up time
-        tk.Label(self.frame, text="Pick-up Time:", font=("Arial", 12)).pack(pady=5)
+        tk.Label(self.frame, text="Pick-up Time:", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
         pick_up_frame = tk.Frame(self.frame)
         pick_up_frame.pack(pady=5)
         pick_up_hour = Combobox(pick_up_frame, values=[f"{i:02}" for i in range(1, 13)], width=5, state="readonly")
@@ -495,18 +503,18 @@ class PetServiceManagementSystem:
     ).pack(pady=10)
 
     # My daycare appointments
-        tk.Label(self.frame, text="My Daycare Appointments", font=("Arial", 16, "bold")).pack(pady=10)
+        tk.Label(self.frame, text="My Daycare Appointments", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").pack(pady=20)
         appointments = db.get_daycare_appointments(username, status="Pending")  # Fetch only pending appointments
         if appointments:
             for i, appointment in enumerate(appointments):
-                tk.Label(self.frame, text=f"{i + 1}. {appointment['pet_name']} - {appointment['date']}").pack(pady=5)
+                tk.Label(self.frame, text=f"{i + 1}. {appointment['pet_name']} - {appointment['date']}", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
                 tk.Button(
                 self.frame,
                 text="Cancel",
                 command=lambda appointment_id=appointment['id']: self.cancel_daycare(username, appointment_id)
             ).pack(pady=5)  # Ensure the button is displayed
         else:
-            tk.Label(self.frame, text="No daycare appointments found.").pack(pady=5)
+            tk.Label(self.frame, text="No daycare appointments found.", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
 
     # Back button
         tk.Button(self.frame, text="Back", command=lambda: self.load_user_dashboard(username)).pack(pady=10)
@@ -520,7 +528,6 @@ class PetServiceManagementSystem:
         except Exception as e:
             messagebox.showerror("Error", f"Failed to cancel appointment: {e}")
     
-    # filepath: c:\Users\User\Documents\GitHub\PetServiceManagementSystem\Main.py
     def submit_daycare_booking(self, username, pet_name, date, drop_off_time, pick_up_time):
         try:
             if not pet_name:
@@ -554,11 +561,11 @@ class PetServiceManagementSystem:
 
     def ServiceHistory(self, username):
         self.clear_frame()
-        tk.Label(self.frame, text="Service History", font=("Arial", 20, "bold")).pack(pady=10)
+        tk.Label(self.frame, text="Service History", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").pack(pady=20)
 
         user_id = db.get_user_id(username)
         if not user_id:
-            tk.Label(self.frame, text="User not found.", font=("Arial", 12)).pack(pady=10)
+            tk.Label(self.frame, text="User not found.", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=10)
             tk.Button(self.frame, text="Back", command=lambda: self.load_user_dashboard(username)).pack(pady=10)
             return
 
@@ -567,25 +574,25 @@ class PetServiceManagementSystem:
         daycare_history = db.get_daycare_services_done(user_id)
 
         if not grooming_history and not daycare_history:
-            tk.Label(self.frame, text="No service history found.", font=("Arial", 12)).pack(pady=10)
+            tk.Label(self.frame, text="No service history found.", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=10)
         else:
         # Display Grooming Services
             if grooming_history:
-                tk.Label(self.frame, text="Grooming Services", font=("Arial", 16, "bold")).pack(pady=10, anchor="w")
+                tk.Label(self.frame, text="Grooming Services", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").pack(pady=20, anchor="w")
                 for record in grooming_history:
                     details = f"Pet: {record['pet_name']}\nDate: {record['date']}\nService: {record['service_type']}"
-                    tk.Label(self.frame, text=details, justify="left", font=("Arial", 12)).pack(pady=5, anchor="w")
+                    tk.Label(self.frame, text=details, justify="left", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5, anchor="w")
             else:
-                tk.Label(self.frame, text="No grooming services found.", font=("Arial", 12)).pack(pady=5, anchor="w")
+                tk.Label(self.frame, text="No grooming services found.", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5, anchor="w")
 
         # Display Daycare Services
             if daycare_history:
-                tk.Label(self.frame, text="Daycare Services", font=("Arial", 16, "bold")).pack(pady=10, anchor="w")
+                tk.Label(self.frame, text="Daycare Services", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").pack(pady=20, anchor="w")
                 for record in daycare_history:
                     details = f"Pet: {record['pet_name']}\nDate: {record['date']}\nDetails: {record['details']}"
-                    tk.Label(self.frame, text=details, justify="left", font=("Arial", 12)).pack(pady=5, anchor="w")
+                    tk.Label(self.frame, text=details, justify="left", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5, anchor="w")
             else:
-                tk.Label(self.frame, text="No daycare services found.", font=("Arial", 12)).pack(pady=5, anchor="w")
+                tk.Label(self.frame, text="No daycare services found.", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5, anchor="w")
 
         tk.Button(self.frame, text="Back", command=lambda: self.load_user_dashboard(username)).pack(pady=10)
  
@@ -600,19 +607,19 @@ class PetServiceManagementSystem:
 
     def AddPet(self, username):
         self.clear_frame()
-        tk.Label(self.frame, text="Add Pet", font=("Arial", 20, "bold")).grid(row=0, column=0, columnspan=2, pady=10)
-        tk.Label(self.frame, text="Name").grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(self.frame, text="Add Pet", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").grid(row=0, column=0, columnspan=2, pady=20)
+        tk.Label(self.frame, text="Name", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=1, column=0, padx=10, pady=5, sticky="w")
         pet_name = tk.Entry(self.frame)
         pet_name.grid(row=1, column=1, padx=10, pady=5)
-        tk.Label(self.frame, text="Species").grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(self.frame, text="Species", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=2, column=0, padx=10, pady=5, sticky="w")
         species_options = ["Dog", "Cat"]
         pet_species = Combobox(self.frame, values=species_options, state="readonly")
         pet_species.grid(row=2, column=1, padx=10, pady=5)
-        tk.Label(self.frame, text="Age").grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(self.frame, text="Age", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=3, column=0, padx=10, pady=5, sticky="w")
         pet_age = tk.Entry(self.frame)
         pet_age.grid(row=3, column=1, padx=10, pady=5)
-        tk.Label(self.frame, text="Upload Picture").grid(row=4, column=0, padx=10, pady=5, sticky="w")
-        picture_path_label = tk.Label(self.frame, text="No file selected")
+        tk.Label(self.frame, text="Upload Picture", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").grid(row=4, column=0, padx=10, pady=5, sticky="w")
+        picture_path_label = tk.Label(self.frame, text="No file selected", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white")
         picture_path_label.grid(row=4, column=1, padx=10, pady=5)
         upload_button = tk.Button(self.frame, text="Upload Picture", command=lambda: self.upload_picture(picture_path_label))
         upload_button.grid(row=5, column=1, padx=10, pady=5)

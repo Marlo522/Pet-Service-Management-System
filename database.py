@@ -155,12 +155,24 @@ def add_pet(user_id, name, species, age, picture_path=None):
         conn.close()
 
 def delete_pet(user_id, pet_name):
-    """Delete a pet by name for a specific user."""
+    """Delete a pet by name for a specific user and remove related records."""
     try:
         conn = sqlite3.connect('Systemdb.db')
         cursor = conn.cursor()
+
+        # Delete related records from service_history
+        cursor.execute("DELETE FROM service_history WHERE user_id = ? AND pet_name = ?", (user_id, pet_name))
+
+        # Delete related records from grooming_services
+        cursor.execute("DELETE FROM grooming_services WHERE user_id = ? AND pet_name = ?", (user_id, pet_name))
+
+        # Delete the pet itself
         cursor.execute("DELETE FROM pets WHERE user_id = ? AND name = ?", (user_id, pet_name))
+
         conn.commit()
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")  # Debugging output
+        raise
     finally:
         conn.close()
 
