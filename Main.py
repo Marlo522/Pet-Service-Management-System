@@ -438,8 +438,8 @@ class PetServiceManagementSystem:
             messagebox.showerror("Error", f"Failed to book grooming service: {e}")
 
     def create_scrollable_frame(self):
-        """Create a scrollable frame inside the main frame."""
-        self.canvas = tk.Canvas(self.frame, bg="#B7D8E6", highlightthickness=0)
+        """Create a scrollable frame inside the main frame with a larger scroll area."""
+        self.canvas = tk.Canvas(self.frame, bg="#B7D8E6", highlightthickness=0, height=600)  # Increased height
         scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
         self.scrollable_frame = tk.Frame(self.canvas, bg="#B7D8E6")
 
