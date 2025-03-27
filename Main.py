@@ -437,32 +437,50 @@ class PetServiceManagementSystem:
         except Exception as e:
             messagebox.showerror("Error", f"Failed to book grooming service: {e}")
 
+    def create_scrollable_frame(self):
+        """Create a scrollable frame inside the main frame."""
+        self.canvas = tk.Canvas(self.frame, bg="#B7D8E6", highlightthickness=0)
+        scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
+        self.scrollable_frame = tk.Frame(self.canvas, bg="#B7D8E6")
+
+        self.scrollable_frame.bind(
+            "<Configure>",
+            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        )
+
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+
+        self.canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
     def Daycare(self, username):
         self.clear_frame()
-        tk.Label(self.frame, text="Daycare Booking",font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").pack(pady=20)
+        self.create_scrollable_frame()
+        tk.Label(self.scrollable_frame, text="Daycare Booking", font=("Bebas Neue", 20), bg="#B7D8E6", fg="white").pack(pady=20)
 
-    # Fetch user's pets
+        # Fetch user's pets
         pets = db.get_user_pets(username)
         if not pets:
-            tk.Label(self.frame, text="No pets registered. Please add a pet first.", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=10)
-            tk.Button(self.frame, text="Back", command=lambda: self.load_user_dashboard(username)).pack(pady=10)
+            tk.Label(self.scrollable_frame, text="No pets registered. Please add a pet first.", font=("Bebas Neue", 10), bg="#B7D8E6", fg="white").pack(pady=10)
+            tk.Button(self.scrollable_frame, text="Back", command=lambda: self.load_user_dashboard(username)).pack(pady=10)
             return
 
-    # Pet selection dropdown
-        tk.Label(self.frame, text="Select Pet:", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
+        # Pet selection dropdown
+        tk.Label(self.scrollable_frame, text="Select Pet:", font=("Bebas Neue", 10), bg="#B7D8E6", fg="white").pack(pady=5)
         pet_names = [pet["name"] for pet in pets]
         selected_pet = tk.StringVar()
-        pet_dropdown = Combobox(self.frame, textvariable=selected_pet, values=pet_names, state="readonly")
+        pet_dropdown = Combobox(self.scrollable_frame, textvariable=selected_pet, values=pet_names, state="readonly")
         pet_dropdown.pack(pady=5)
 
-    # Date selection using Calendar
-        tk.Label(self.frame, text="Select Date:", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
-        calendar = Calendar(self.frame, selectmode="day")
+        # Date selection using Calendar
+        tk.Label(self.scrollable_frame, text="Select Date:", font=("Bebas Neue", 10), bg="#B7D8E6", fg="white").pack(pady=5)
+        calendar = Calendar(self.scrollable_frame, selectmode="day")
         calendar.pack(pady=5)
 
-    # Drop-off time
-        tk.Label(self.frame, text="Drop-off Time:", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
-        drop_off_frame = tk.Frame(self.frame)
+        # Drop-off time
+        tk.Label(self.scrollable_frame, text="Drop-off Time:", font=("Bebas Neue", 10), bg="#B7D8E6", fg="white").pack(pady=5)
+        drop_off_frame = tk.Frame(self.scrollable_frame)
         drop_off_frame.pack(pady=5)
         drop_off_hour = Combobox(drop_off_frame, values=[f"{i:02}" for i in range(1, 13)], width=5, state="readonly")
         drop_off_hour.set("01")
@@ -474,9 +492,9 @@ class PetServiceManagementSystem:
         drop_off_ampm.set("AM")
         drop_off_ampm.grid(row=0, column=2, padx=2)
 
-    # Pick-up time
-        tk.Label(self.frame, text="Pick-up Time:", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
-        pick_up_frame = tk.Frame(self.frame)
+        # Pick-up time
+        tk.Label(self.scrollable_frame, text="Pick-up Time:", font=("Bebas Neue", 10), bg="#B7D8E6", fg="white").pack(pady=5)
+        pick_up_frame = tk.Frame(self.scrollable_frame)
         pick_up_frame.pack(pady=5)
         pick_up_hour = Combobox(pick_up_frame, values=[f"{i:02}" for i in range(1, 13)], width=5, state="readonly")
         pick_up_hour.set("01")
@@ -488,36 +506,36 @@ class PetServiceManagementSystem:
         pick_up_ampm.set("AM")
         pick_up_ampm.grid(row=0, column=2, padx=2)
 
-    # Submit button
+        # Submit button
         tk.Button(
-        self.frame,
-        text="Book Daycare",
-        font=("Arial", 12, "bold"),
-        command=lambda: self.submit_daycare_booking(
-            username,
-            selected_pet.get(),
-            calendar.get_date(),
-            f"{drop_off_hour.get()}:{drop_off_minute.get()} {drop_off_ampm.get()}",
-            f"{pick_up_hour.get()}:{pick_up_minute.get()} {pick_up_ampm.get()}"
-        )
-    ).pack(pady=10)
+            self.scrollable_frame,
+            text="Book Daycare",
+            font=("Arial", 12, "bold"),
+            command=lambda: self.submit_daycare_booking(
+                username,
+                selected_pet.get(),
+                calendar.get_date(),
+                f"{drop_off_hour.get()}:{drop_off_minute.get()} {drop_off_ampm.get()}",
+                f"{pick_up_hour.get()}:{pick_up_minute.get()} {pick_up_ampm.get()}"
+            )
+        ).pack(pady=10)
 
-    # My daycare appointments
-        tk.Label(self.frame, text="My Daycare Appointments", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").pack(pady=20)
+        # My daycare appointments
+        tk.Label(self.scrollable_frame, text="My Daycare Appointments", font=("Bebas Neue", 20), bg="#B7D8E6", fg="white").pack(pady=20)
         appointments = db.get_daycare_appointments(username, status="Pending")  # Fetch only pending appointments
         if appointments:
             for i, appointment in enumerate(appointments):
-                tk.Label(self.frame, text=f"{i + 1}. {appointment['pet_name']} - {appointment['date']}", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
+                tk.Label(self.scrollable_frame, text=f"{i + 1}. {appointment['pet_name']} - {appointment['date']}", font=("Bebas Neue", 10), bg="#B7D8E6", fg="white").pack(pady=5)
                 tk.Button(
-                self.frame,
-                text="Cancel",
-                command=lambda appointment_id=appointment['id']: self.cancel_daycare(username, appointment_id)
-            ).pack(pady=5)  # Ensure the button is displayed
+                    self.scrollable_frame,
+                    text="Cancel",
+                    command=lambda appointment_id=appointment['id']: self.cancel_daycare(username, appointment_id)
+                ).pack(pady=5)  # Ensure the button is displayed
         else:
-            tk.Label(self.frame, text="No daycare appointments found.", font=("Bebas Neue", 10),bg="#B7D8E6",fg="white").pack(pady=5)
+            tk.Label(self.scrollable_frame, text="No daycare appointments found.", font=("Bebas Neue", 10), bg="#B7D8E6", fg="white").pack(pady=5)
 
-    # Back button
-        tk.Button(self.frame, text="Back", command=lambda: self.load_user_dashboard(username)).pack(pady=10)
+        # Back button
+        tk.Button(self.scrollable_frame, text="Back", command=lambda: self.load_user_dashboard(username)).pack(pady=10)
 
     def cancel_daycare(self, username, appointment_id):
         """Cancel a daycare appointment by its ID."""
