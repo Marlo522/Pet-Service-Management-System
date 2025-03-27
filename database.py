@@ -308,26 +308,20 @@ def get_grooming_services_done(user_id):
     try:
         conn = sqlite3.connect('Systemdb.db')
         cursor = conn.cursor()
-        cursor.execute("""
-            SELECT pet_name, service_type, date, details, status
-            FROM service_history
-            WHERE user_id = ? AND service_type = 'Grooming' AND status = 'Done'
-            ORDER BY date DESC
-        """, (user_id,))
-        history = [
-            {
-                "pet_name": row[0],
-                "service_type": row[1],
-                "date": row[2],
-                "details": row[3],
-                "status": row[4]
-            }
-            for row in cursor.fetchall()
-        ]
-        return history
+        query = """
+            SELECT pet_name, service_type, service_date AS date
+            FROM grooming_services
+            WHERE user_id = ? AND status = 'Done'
+            ORDER BY service_date DESC
+        """
+        cursor.execute(query, (user_id,))
+        return [{"pet_name": row[0], "service_type": row[1], "date": row[2]} for row in cursor.fetchall()]
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")  # Debugging output
+        return []
     finally:
         conn.close()
-
+ 
 def get_daycare_services_done(user_id):
     """Retrieve all daycare services with status 'Done' for a specific user."""
     try:
@@ -341,6 +335,9 @@ def get_daycare_services_done(user_id):
         """
         cursor.execute(query, (user_id,))
         return [{"pet_name": row[0], "service_type": row[1], "date": row[2], "details": row[3]} for row in cursor.fetchall()]
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")  # Debugging output
+        return []
     finally:
         conn.close()
 

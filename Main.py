@@ -556,32 +556,29 @@ class PetServiceManagementSystem:
         self.clear_frame()
         tk.Label(self.frame, text="Service History", font=("Arial", 20, "bold")).pack(pady=10)
 
-    # Get user ID
         user_id = db.get_user_id(username)
         if not user_id:
             tk.Label(self.frame, text="User not found.", font=("Arial", 12)).pack(pady=10)
             tk.Button(self.frame, text="Back", command=lambda: self.load_user_dashboard(username)).pack(pady=10)
             return
 
-    # Fetch grooming services with status 'Done'
+    # Fetch grooming and daycare services with status 'Done'
         grooming_history = db.get_grooming_services_done(user_id)
-
-    # Fetch daycare services with status 'Done'
         daycare_history = db.get_daycare_services_done(user_id)
 
         if not grooming_history and not daycare_history:
-            tk.Label(self.frame, text="No completed services found.", font=("Arial", 12)).pack(pady=10)
+            tk.Label(self.frame, text="No service history found.", font=("Arial", 12)).pack(pady=10)
         else:
-        # Display grooming services
+        # Display Grooming Services
             if grooming_history:
                 tk.Label(self.frame, text="Grooming Services", font=("Arial", 16, "bold")).pack(pady=10, anchor="w")
                 for record in grooming_history:
-                    details = f"Pet: {record['pet_name']}\nDate: {record['date']}\nService: {record['service_type']}\nDetails: {record['details']}"
+                    details = f"Pet: {record['pet_name']}\nDate: {record['date']}\nService: {record['service_type']}"
                     tk.Label(self.frame, text=details, justify="left", font=("Arial", 12)).pack(pady=5, anchor="w")
             else:
                 tk.Label(self.frame, text="No grooming services found.", font=("Arial", 12)).pack(pady=5, anchor="w")
 
-        # Display daycare services
+        # Display Daycare Services
             if daycare_history:
                 tk.Label(self.frame, text="Daycare Services", font=("Arial", 16, "bold")).pack(pady=10, anchor="w")
                 for record in daycare_history:
@@ -590,9 +587,9 @@ class PetServiceManagementSystem:
             else:
                 tk.Label(self.frame, text="No daycare services found.", font=("Arial", 12)).pack(pady=5, anchor="w")
 
-    # Back button
         tk.Button(self.frame, text="Back", command=lambda: self.load_user_dashboard(username)).pack(pady=10)
-
+ 
+    
     def update_service_status(self, record_id):
         try:
             db.update_service_status(record_id, "Done")
