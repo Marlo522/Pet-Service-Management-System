@@ -5,6 +5,7 @@ import database as db
 import random
 from PIL import Image, ImageTk  # Add this import for image handling
 from tkcalendar import Calendar  # Import Calendar for date selection
+import sqlite3
 
 db.connect_db()
 
@@ -73,12 +74,12 @@ class PetServiceManagementSystem:
 
     def load_admin_dashboard(self):
         self.clear_frame()
-        tk.Label(self.frame, text="Admin Dashboard", font=("Bebas Neue", 20),bg="#B7D8E6",fg="white").pack(pady=20)
+        tk.Label(self.frame, text="Admin Dashboard", font=("Bebas Neue", 20), bg="#B7D8E6", fg="white").pack(pady=20)
         tk.Button(self.frame, text="Manage Users", font=("Arial", 12, "bold"), command=self.view_all_users).pack(pady=5)
         tk.Button(self.frame, text="Manage Pets", font=("Arial", 12, "bold"), command=self.view_all_pets).pack(pady=5)
         tk.Button(self.frame, text="Manage Grooming Appointments", font=("Arial", 12, "bold"), command=self.manage_grooming_appointments).pack(pady=5)
-        tk.Button(self.frame, text="Manage Daycare Booking", font=("Arial", 12, "bold"), command=self.manage_service_history).pack(pady=5)
-        tk.Button(self.frame, text="View Service History", font=("Arial", 12, "bold"), command=self.Doctor).pack(pady=10)
+        tk.Button(self.frame, text="Manage Daycare Booking", font=("Arial", 12, "bold"), command=self.manage_daycare_bookings).pack(pady=5)
+        tk.Button(self.frame, text="View Service History", font=("Arial", 12, "bold"), command=self.manage_service_history).pack(pady=10)  # Fixed command
         tk.Button(self.frame, text="Back", command=self.back_to_main).pack(pady=10)
         
     def load_user_dashboard(self, username):
@@ -547,6 +548,7 @@ class PetServiceManagementSystem:
             messagebox.showerror("Error", f"Failed to cancel appointment: {e}")
     
     def submit_daycare_booking(self, username, pet_name, date, drop_off_time, pick_up_time):
+        """Submit a daycare booking."""
         try:
             if not pet_name:
                 raise ValueError("Please select a pet.")
@@ -555,27 +557,24 @@ class PetServiceManagementSystem:
             if not drop_off_time or not pick_up_time:
                 raise ValueError("Please specify both drop-off and pick-up times.")
 
+            # Get the user ID from the username
             user_id = db.get_user_id(username)
             if not user_id:
                 raise ValueError("User not found.")
 
-        # Save to service history with status 'Pending'
-            status = "Pending"  # Change this to 'Done' if you want it to be marked as completed immediately
-            db.add_service_history(
-            user_id,
-            pet_name,
-            "Daycare",
-            date=date,
-            details=f"Drop-off: {drop_off_time}, Pick-up: {pick_up_time}",
-            status=status
-        )
+            # Save the booking to the database
+            status = "Pending"
+            db.add_daycare_booking(user_id, pet_name, date, drop_off_time, pick_up_time, status)
 
+            # Show success message
             messagebox.showinfo("Success", f"Daycare booked for {pet_name} on {date}.\nDrop-off: {drop_off_time}, Pick-up: {pick_up_time}")
-            self.Daycare(username)
+            self.Daycare(username)  # Refresh the daycare page
         except ValueError as ve:
             messagebox.showerror("Input Error", str(ve))
+        except sqlite3.Error as e:
+            messagebox.showerror("Database Error", f"Failed to book daycare: {e}")
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to book daycare: {e}")
+            messagebox.showerror("Error", f"An unexpected error occurred: {e}")
 
     def ServiceHistory(self, username):
         self.clear_frame()
@@ -678,6 +677,51 @@ class PetServiceManagementSystem:
             messagebox.showerror("Input Error", str(ve))
         except Exception as e:
             messagebox.showerror("Error", f"Failed to add pet: {e}")
+
+    def manage_daycare_bookings(self):
+        """Display and manage daycare bookings."""
+        self.clear_frame()
+        tk.Label(self.frame, text="Manage Daycare Bookings", font=("Bebas Neue", 20), bg="#B7D8E6", fg="white").pack(pady=20)
+
+        # Fetch all daycare bookings with status = 'Pending'
+        bookings = db.get_all_daycare_bookings()
+        pending_bookings = [booking for booking in bookings if booking["status"] == "Pending"]
+
+        if pending_bookings:
+            for booking in pending_bookings:
+                booking_frame = tk.Frame(self.frame, borderwidth=1, relief="solid", padx=10, pady=10)
+                booking_frame.pack(fill=tk.X, padx=10, pady=5)
+
+                details = (
+                    f"ID: {booking['id']}\n"
+                    f"User ID: {booking['user_id']}\n"
+                    f"Pet: {booking['pet_name']}\n"
+                    f"Date: {booking['date']}\n"
+                    f"Drop-off: {booking['drop_off_time']}\n"
+                    f"Pick-up: {booking['pick_up_time']}\n"
+                    f"Status: {booking['status']}"
+                )
+                tk.Label(booking_frame, text=details, justify="left", font=("Bebas Neue", 10), bg="#B7D8E6", fg="white").pack(side=tk.LEFT, padx=10)
+
+                # Add a button to mark the booking as "Done"
+                tk.Button(
+                    booking_frame,
+                    text="Mark as Done",
+                    command=lambda booking_id=booking['id']: self.update_daycare_status(booking_id)
+                ).pack(side=tk.RIGHT, padx=10)
+        else:
+            tk.Label(self.frame, text="No pending daycare bookings found.", font=("Bebas Neue", 10), bg="#B7D8E6", fg="white").pack(pady=10)
+
+        tk.Button(self.frame, text="Back", command=self.load_admin_dashboard).pack(pady=10)
+
+    def update_daycare_status(self, booking_id):
+        """Mark a daycare booking as 'Done'."""
+        try:
+            db.update_daycare_status(booking_id, "Done")
+            messagebox.showinfo("Success", "Daycare booking marked as 'Done'!")
+            self.manage_daycare_bookings()  # Refresh the daycare bookings menu
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to update booking status: {e}")
 
 window = tk.Tk()
 PetServiceManagementSystem(window)

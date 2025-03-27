@@ -3,71 +3,83 @@ import random
 import os  # Import os module for path handling
 
 def connect_db():
-    conn = sqlite3.connect('Systemdb.db')
-    cursor = conn.cursor()
-    cursor.execute("PRAGMA foreign_keys = ON;")
+    with sqlite3.connect('Systemdb.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA foreign_keys = ON;")
 
-    # Create Users Table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
-    );
-    """)
+        # Create Users Table
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        );
+        """)
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS pets (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        name TEXT NOT NULL,
-        species TEXT NOT NULL,
-        age INTEGER,
-        picture_path TEXT,
-        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-    );
-    """)
-    
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS grooming_services (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        pet_name TEXT NOT NULL,
-        service_type TEXT NOT NULL,
-        service_date TEXT NOT NULL,
-        status TEXT DEFAULT 'Pending',
-        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-    );
-    """)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS pets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            species TEXT NOT NULL,
+            age INTEGER,
+            picture_path TEXT,
+            FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+        );
+        """)
+        
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS grooming_services (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            pet_name TEXT NOT NULL,
+            service_type TEXT NOT NULL,
+            service_date TEXT NOT NULL,
+            status TEXT DEFAULT 'Pending',
+            FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+        );
+        """)
 
-    # Create Service History Table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS service_history (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        pet_name TEXT NOT NULL,
-        service_type TEXT NOT NULL,
-        date TEXT NOT NULL,
-        details TEXT,
-        status TEXT DEFAULT 'Pending',
-        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-    );
-    """)
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS admin (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
-    );
-    """)
+        # Create Service History Table
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS service_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            pet_name TEXT NOT NULL,
+            service_type TEXT NOT NULL,
+            date TEXT NOT NULL,
+            details TEXT,
+            status TEXT DEFAULT 'Pending',
+            FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+        );
+        """)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS admin (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        );
+        """)
 
-    # Insert Predefined Admin Account if Not Exists
-    cursor.execute("SELECT COUNT(*) FROM admin WHERE username = ?", ("admin",))
-    if cursor.fetchone()[0] == 0:
-        cursor.execute("INSERT INTO admin (username, password) VALUES (?, ?)", ("admin", "admin"))
+        # Insert Predefined Admin Account if Not Exists
+        cursor.execute("SELECT COUNT(*) FROM admin WHERE username = ?", ("admin",))
+        if cursor.fetchone()[0] == 0:
+            cursor.execute("INSERT INTO admin (username, password) VALUES (?, ?)", ("admin", "admin"))
+
+        # Create daycare_bookings table if it doesn't exist
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS daycare_bookings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                pet_name TEXT NOT NULL,
+                date TEXT NOT NULL,
+                drop_off_time TEXT NOT NULL,
+                pick_up_time TEXT NOT NULL,
+                status TEXT DEFAULT 'Pending',
+                FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+            );
+        """)
         conn.commit()
-
-    conn.close()
 
 def insert_user(username, password):
     try:
@@ -224,7 +236,7 @@ def add_grooming_service(user_id, pet_name, service_type, service_date, status='
         cursor = conn.cursor()
         cursor.execute("""
             INSERT INTO grooming_services (user_id, pet_name, service_type, service_date, status)
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?)
         """, (user_id, pet_name, service_type, service_date, status))
         conn.commit()
     except sqlite3.Error as e:
@@ -516,3 +528,43 @@ def update_grooming_status(appointment_id, new_status):
         conn.commit()
     finally:
         conn.close()
+
+def get_all_daycare_bookings():
+    conn = sqlite3.connect('Systemdb.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM daycare_bookings")
+    columns = [column[0] for column in cursor.description]
+    bookings = [dict(zip(columns, row)) for row in cursor.fetchall()]
+    conn.close()
+    return bookings
+
+def update_daycare_status(booking_id, status):
+    """Update the status of a daycare booking."""
+    with sqlite3.connect('Systemdb.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE daycare_bookings
+            SET status = ?
+            WHERE id = ?
+        """, (status, booking_id))
+        conn.commit()
+
+def add_service_history(user_id, pet_name, service_type, date, details, status):
+    """Add a service history record."""
+    with sqlite3.connect('Systemdb.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO service_history (user_id, pet_name, service_type, date, details, status)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (user_id, pet_name, service_type, date, details, status))
+        conn.commit()
+
+def add_daycare_booking(user_id, pet_name, date, drop_off_time, pick_up_time, status):
+    """Add a daycare booking."""
+    with sqlite3.connect('Systemdb.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO daycare_bookings (user_id, pet_name, date, drop_off_time, pick_up_time, status)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (user_id, pet_name, date, drop_off_time, pick_up_time, status))
+        conn.commit()
