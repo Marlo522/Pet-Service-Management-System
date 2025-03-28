@@ -390,48 +390,72 @@ class PetServiceManagementSystem:
     def view_service_history(self):
         """Display the service history for all users."""
         self.clear_frame()
-        
-        # Title label with updated font and color
+    
+        # Title label
         tk.Label(self.frame, text="SERVICE HISTORY", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
-
+    
         # Create a scrollable frame for service history
         self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=1100, height=500)
         self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
         self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
-        
+    
+        # Configure the canvas to scroll properly
         self.scrollable_frame.bind(
             "<Configure>",
             lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
-
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=1100)
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw", width=1100)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
-
-        self.canvas.pack(side="left", fill="both", expand=True)
+    
+        # Pack the canvas and scrollbar
         self.scrollbar.pack(side="right", fill="y")
-
-        # Fetch all service history records
-        history = db.get_all_service_history()
-        if not history:
+        self.canvas.pack(side="left", fill="both", expand=True)
+    
+        # Fetch grooming and daycare services with status 'Done'
+        grooming_history = db.get_grooming_services_done()
+        daycare_history = db.get_daycare_services_done()
+    
+        if not grooming_history and not daycare_history:
             tk.Label(self.scrollable_frame, text="No service history found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
         else:
-            for record in history:
-                details = (
-                    f"ID: {record['id']} | "
-                    f"Pet: {record['pet_name']} | "
-                    f"Service: {record['service_type']} | "
-                    f"Date: {record['date']} | "
-                    f"Details: {record['details']} | "
-                    f"Status: {record['status']}"
-                )
-                tk.Label(self.scrollable_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
-
+            # Display Grooming Services
+            if grooming_history:
+                tk.Label(self.scrollable_frame, text="Grooming Services", font=("Century Gothic", 20), bg="#FFFFED", fg="#2B2C41").pack(pady=20, anchor="w")
+                for record in grooming_history:
+                    details = f"Pet: {record['pet_name']} | Date: {record['service_date']} | Service: {record['service_type']}"
+                    tk.Label(
+                        self.scrollable_frame,
+                        text=details,
+                        justify="left",
+                        font=("Century Gothic", 15),
+                        bg="#FFFFED",
+                        fg="#2B2C41",
+                        wraplength=1000,  # Allow text to wrap within 1000 pixels
+                        anchor="w"
+                    ).pack(pady=5, anchor="w")
+    
+            # Display Daycare Services
+            if daycare_history:
+                tk.Label(self.scrollable_frame, text="Daycare Services", font=("Century Gothic", 20), bg="#FFFFED", fg="#2B2C41").pack(pady=20, anchor="w")
+                for record in daycare_history:
+                    details = f"Pet: {record['pet_name']} | Date: {record['date']} | Drop-off: {record['drop_off_time']} | Pick-up: {record['pick_up_time']}"
+                    tk.Label(
+                        self.scrollable_frame,
+                        text=details,
+                        justify="left",
+                        font=("Century Gothic", 15),
+                        bg="#FFFFED",
+                        fg="#2B2C41",
+                        wraplength=1000,  # Allow text to wrap within 1000 pixels
+                        anchor="w"
+                    ).pack(pady=5, anchor="w")
+    
         # Back button centered at the bottom
         back_button_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED")  # Create a frame for the back button
         back_button_frame.pack(pady=20)  # Add padding around the button frame
         tk.Button(back_button_frame, text="Back", command=self.load_admin_dashboard, font=("Century Gothic", 15), 
-                bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
-
+                  bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
+        
     def UserLogIn(self):
         # Display the user login interface.
         self.clear_frame()
@@ -931,65 +955,62 @@ class PetServiceManagementSystem:
             messagebox.showerror("Error", f"Failed to book daycare: {e}")
 
     def ServiceHistory(self, username):
-    # Display the service history for the user, including grooming and daycare services
+        """Display the service history for the user, including grooming and daycare services."""
         self.clear_frame()
     
-    # Title label
+        # Title label
         tk.Label(self.frame, text="🔎 SERVICE HISTORY 🔍", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
-
+    
+        # Get the user ID
         user_id = db.get_user_id(username)
         if not user_id:
             tk.Label(self.frame, text="User not found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
             tk.Button(self.frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
-                  bg="#EDCC6F", fg="#2B2C41").pack(pady=20)
+                      bg="#EDCC6F", fg="#2B2C41").pack(pady=20)
             return
-
-    # Create a scrollable frame for service history
+    
+        # Create a scrollable frame for service history
         self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=900, height=500)
         self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
         self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
     
         self.scrollable_frame.bind(
-        "<Configure>",
-        lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+            "<Configure>",
+            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
-
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=900)
+    
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw", width=900)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
-
+    
         self.canvas.pack(side="left", fill="both", expand=True)
         self.scrollbar.pack(side="right", fill="y")
-
-    # Fetch grooming and daycare services with status 'Done'
-        grooming_history = db.get_grooming_services_done(user_id)
-        daycare_history = db.get_daycare_services_done(user_id)
-
+    
+        # Fetch grooming and daycare services with status 'Done'
+        grooming_history = db.get_grooming_services_done_for_user(user_id)
+        daycare_history = db.get_daycare_services_done_for_user(user_id)
+    
         if not grooming_history and not daycare_history:
             tk.Label(self.scrollable_frame, text="No service history found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
         else:
-        # Display Grooming Services
+            # Display Grooming Services
             if grooming_history:
                 tk.Label(self.scrollable_frame, text="Grooming Services", font=("Century Gothic", 20), bg="#FFFFED", fg="#2B2C41").pack(pady=20, anchor="w")
                 for record in grooming_history:
-                    details = f"Pet: {record['pet_name']} | Date: {record['date']} | Service: {record['service_type']}"
+                    details = f"Pet: {record['pet_name']} | Date: {record['service_date']} | Service: {record['service_type']}"
                     tk.Label(self.scrollable_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5, anchor="w")
-            else:
-                tk.Label(self.scrollable_frame, text="No grooming services found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5, anchor="w")
-
-        # Display Daycare Services
+    
+            # Display Daycare Services
             if daycare_history:
                 tk.Label(self.scrollable_frame, text="Daycare Services", font=("Century Gothic", 20), bg="#FFFFED", fg="#2B2C41").pack(pady=20, anchor="w")
                 for record in daycare_history:
-                    details = f"Pet: {record['pet_name']} | Date: {record['date']} | Details: {record['details']}"
+                    details = f"Pet: {record['pet_name']} | Date: {record['date']} | Drop-off: {record['drop_off_time']} | Pick-up: {record['pick_up_time']}"
                     tk.Label(self.scrollable_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5, anchor="w")
-            else:
-                tk.Label(self.scrollable_frame, text="No daycare services found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5, anchor="w")
-
-    # Back button centered at the bottom
+    
+        # Back button centered at the bottom
         back_button_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED")  # Create a frame for the back button
         back_button_frame.pack(pady=20)  # Add padding around the button frame
         tk.Button(back_button_frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
-              bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
+                  bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
 
     def AddPet(self, username):
         # Display the interface for adding a new pet

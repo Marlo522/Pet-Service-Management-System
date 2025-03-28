@@ -53,6 +53,7 @@ def connect_db():
             FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
         );
         """)
+        
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS admin (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -348,43 +349,70 @@ def get_all_grooming_appointments():
     finally:
         conn.close()
 
-def get_grooming_services_done(user_id):
-    """Retrieve all grooming services with status 'Done' for a specific user."""
-    try:
-        conn = sqlite3.connect('Systemdb.db')
+def get_grooming_services_done():
+    """Retrieve all grooming services with status 'Done'."""
+    with sqlite3.connect('Systemdb.db') as conn:
         cursor = conn.cursor()
-        query = """
-            SELECT pet_name, service_type, service_date AS date
+        cursor.execute("""
+            SELECT id, user_id, pet_name, service_type, service_date, status
+            FROM grooming_services
+            WHERE status = 'Done'
+            ORDER BY service_date DESC
+        """)
+        columns = [column[0] for column in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+def get_grooming_services_done():
+    """Retrieve all grooming services with status 'Done'."""
+    with sqlite3.connect('Systemdb.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, user_id, pet_name, service_type, service_date, status
+            FROM grooming_services
+            WHERE status = 'Done'
+            ORDER BY service_date DESC
+        """)
+        columns = [column[0] for column in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+ 
+def get_daycare_services_done():
+    """Retrieve all daycare bookings with status 'Done'."""
+    with sqlite3.connect('Systemdb.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, user_id, pet_name, date, drop_off_time, pick_up_time, status
+            FROM daycare_bookings
+            WHERE status = 'Done'
+            ORDER BY date DESC
+        """)
+        columns = [column[0] for column in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+def get_daycare_services_done_for_user(user_id):
+    """Retrieve all daycare bookings with status 'Done' for a specific user."""
+    with sqlite3.connect('Systemdb.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, user_id, pet_name, date, drop_off_time, pick_up_time, status
+            FROM daycare_bookings
+            WHERE user_id = ? AND status = 'Done'
+            ORDER BY date DESC
+        """, (user_id,))
+        columns = [column[0] for column in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+def get_grooming_services_done_for_user(user_id):
+    """Retrieve all grooming services with status 'Done' for a specific user."""
+    with sqlite3.connect('Systemdb.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, user_id, pet_name, service_type, service_date, status
             FROM grooming_services
             WHERE user_id = ? AND status = 'Done'
             ORDER BY service_date DESC
-        """
-        cursor.execute(query, (user_id,))
-        return [{"pet_name": row[0], "service_type": row[1], "date": row[2]} for row in cursor.fetchall()]
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")  # Debugging output
-        return []
-    finally:
-        conn.close()
- 
-def get_daycare_services_done(user_id):
-    """Retrieve all daycare services with status 'Done' for a specific user."""
-    try:
-        conn = sqlite3.connect('Systemdb.db')
-        cursor = conn.cursor()
-        query = """
-            SELECT pet_name, service_type, date, details
-            FROM service_history
-            WHERE user_id = ? AND service_type = 'Daycare' AND status = 'Done'
-            ORDER BY date DESC
-        """
-        cursor.execute(query, (user_id,))
-        return [{"pet_name": row[0], "service_type": row[1], "date": row[2], "details": row[3]} for row in cursor.fetchall()]
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")  # Debugging output
-        return []
-    finally:
-        conn.close()
+        """, (user_id,))
+        columns = [column[0] for column in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 def get_service_history(user_id):
     """Retrieve all service history for a specific user."""
