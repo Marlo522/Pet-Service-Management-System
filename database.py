@@ -195,6 +195,27 @@ def edit_pet(user_id, old_name, new_name, new_species, new_age, new_picture_path
     finally:
         conn.close()
 
+def delete_user(user_id):
+    """Delete a user from the database by user ID."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        
+        # Delete the user from the users table
+        cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
+        
+        # Optionally, you can also delete related pets and services if needed
+        cursor.execute("DELETE FROM pets WHERE user_id = ?", (user_id,))
+        cursor.execute("DELETE FROM grooming_services WHERE user_id = ?", (user_id,))
+        cursor.execute("DELETE FROM service_history WHERE user_id = ?", (user_id,))
+        
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")  # Debugging output
+        raise
+    finally:
+        conn.close()
+        
 def get_all_users():
     """Retrieve all users from the database."""
     try:
@@ -513,6 +534,21 @@ def update_grooming_status(appointment_id, new_status):
             SET status = ?
             WHERE id = ?
         """, (new_status, appointment_id))
+        conn.commit()
+    finally:
+        conn.close()
+
+def get_all_daycare_booking():
+    """Retrieve all daycare bookings for admin view."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT *
+            FROM service_history
+            WHERE service_type = 'Daycare'
+            ORDER BY date DESC
+        """)
         conn.commit()
     finally:
         conn.close()
