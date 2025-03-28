@@ -683,7 +683,6 @@ class PetServiceManagementSystem:
             db.edit_pet(user_id, old_name, new_name, new_species, new_age, new_picture_path)
         
             # Update pet name in service history, grooming services, and daycare
-            db.update_pet_name_in_service_history(user_id, old_name, new_name)
             db.update_pet_name_in_grooming_services(user_id, old_name, new_name)
             db.update_pet_name_in_daycare_services(user_id, old_name, new_name)
         
