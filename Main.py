@@ -24,7 +24,7 @@ class PetServiceManagementSystem:
         # Initialize the main window and set up the layout
         self.window = window
         self.window.title("PET SERVICE MANAGEMENT SYSTEM")
-        self.window.geometry("1400x700")
+        self.window.geometry("1200x700")
         self.window.configure(bg="#D2EBFF")
 
         # Title label
@@ -166,7 +166,7 @@ class PetServiceManagementSystem:
         self.clear_frame()
         
         # Title label with updated font and color
-        tk.Label(self.frame, text="👥 MANAGE USERS 👥", font=("Century Gothic", 20, "bold"), bg="#D2EBFF", fg="#2B2C41").pack(pady=20)
+        tk.Label(self.frame, text="👥 MANAGE USERS 👥", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
         # Create a box frame for user management
         user_box = tk.Frame(self.frame, bg="#FFFFED", bd=0)  # Create a frame without a border
@@ -196,7 +196,7 @@ class PetServiceManagementSystem:
         self.clear_frame()
         
         # Title label with updated font and color
-        tk.Label(self.frame, text="🐕 MANAGE PETS 🐈", font=("Century Gothic", 20, "bold"), bg="#D2EBFF", fg="#2B2C41").pack(pady=20)
+        tk.Label(self.frame, text="🐕 MANAGE PETS 🐈", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
         # Create a box frame for pets
         pet_box = tk.Frame(self.frame, bg="#FFFFED", bd=0)  # Create a frame without a border
@@ -256,7 +256,7 @@ class PetServiceManagementSystem:
             lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=900)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -293,7 +293,7 @@ class PetServiceManagementSystem:
             tk.Label(self.scrollable_frame, text="No daycare bookings found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
 
         # Back button with updated style
-        tk.Button(self.frame, text="Back", command=self.load_admin_dashboard, font=("Century Gothic", 15), 
+        tk.Button(self.scrollable_frame, text="Back", command=self.load_admin_dashboard, font=("Century Gothic", 15), 
                 bg="#EDCC6F", fg="#2B2C41").pack(pady=20)
     
     def manage_grooming_appointments(self):
@@ -313,7 +313,7 @@ class PetServiceManagementSystem:
             lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=900)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -351,7 +351,7 @@ class PetServiceManagementSystem:
             tk.Label(self.scrollable_frame, text="No pending grooming appointments found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
 
         # Back button centered at the bottom
-        back_button_frame = tk.Frame(self.frame, bg="#FFFFED")  # Create a frame for the back button
+        back_button_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED")  # Create a frame for the back button
         back_button_frame.pack(pady=20)  # Add padding around the button frame
         tk.Button(back_button_frame, text="Back", command=self.load_admin_dashboard, font=("Century Gothic", 15), 
                 bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
@@ -391,7 +391,7 @@ class PetServiceManagementSystem:
             lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=1100)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -414,7 +414,7 @@ class PetServiceManagementSystem:
                 tk.Label(self.scrollable_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
 
         # Back button centered at the bottom
-        back_button_frame = tk.Frame(self.frame, bg="#FFFFED")  # Create a frame for the back button
+        back_button_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED")  # Create a frame for the back button
         back_button_frame.pack(pady=20)  # Add padding around the button frame
         tk.Button(back_button_frame, text="Back", command=self.load_admin_dashboard, font=("Century Gothic", 15), 
                 bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
@@ -500,7 +500,7 @@ class PetServiceManagementSystem:
         tk.Label(self.frame, text="MANAGE MY PETS", font=("Century Gothic", 24), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
     # Create a scrollable frame for pets
-        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=900, height=500, bd=0)
+        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=500, height=500, bd=0)
         self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
         self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
     
@@ -509,7 +509,7 @@ class PetServiceManagementSystem:
         lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
     )
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=500)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -553,10 +553,10 @@ class PetServiceManagementSystem:
             tk.Label(self.scrollable_frame, text="No pets registered yet.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
 
     # Add Pet button
-        tk.Button(self.frame, text="Add Pet", font=("Century Gothic", 15), command=lambda: self.AddPet(username), bg="#EDCC6F", fg="#2B2C41").pack(pady=10)
+        tk.Button(self.scrollable_frame, text="Add Pet", font=("Century Gothic", 15), command=lambda: self.AddPet(username), bg="#EDCC6F", fg="#2B2C41").pack(pady=10)
 
     # Back button
-        tk.Button(self.frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
+        tk.Button(self.scrollable_frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
               bg="#EDCC6F", fg="#2B2C41").pack(pady=10)
 
     def DeletePet(self, username, pet_name):
@@ -579,31 +579,31 @@ class PetServiceManagementSystem:
         tk.Label(self.frame, text="EDIT PET", font=("Century Gothic", 24), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
         # Create a frame for the input fields
-        input_frame = tk.Frame(self.frame, bg="#D2EBFF")  # Frame for input fields
+        input_frame = tk.Frame(self.frame, bg="#FFFFED")  # Frame for input fields
         input_frame.pack(pady=20, padx=30)  # Add padding around the input frame
 
         # Name input
-        tk.Label(input_frame, text="Name", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=0, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(input_frame, text="Name", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=0, column=0, padx=10, pady=5, sticky="w")
         pet_name = tk.Entry(input_frame, font=("Century Gothic", 15))
         pet_name.insert(0, pet['name'])
         pet_name.grid(row=0, column=1, padx=10, pady=5)
 
         # Species input
-        tk.Label(input_frame, text="Species", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(input_frame, text="Species", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=1, column=0, padx=10, pady=5, sticky="w")
         species_options = ["Dog", "Cat"]
         pet_species = Combobox(input_frame, values=species_options, state="readonly", font=("Century Gothic", 15))
         pet_species.set(pet['species'])
         pet_species.grid(row=1, column=1, padx=10, pady=5)
 
         # Age input
-        tk.Label(input_frame, text="Age", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(input_frame, text="Age", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=2, column=0, padx=10, pady=5, sticky="w")
         pet_age = tk.Entry(input_frame, font=("Century Gothic", 15))
         pet_age.insert(0, pet['age'])
         pet_age.grid(row=2, column=1, padx=10, pady=5)
 
         # Upload Picture
-        tk.Label(input_frame, text="Upload Picture", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=3, column=0, padx=10, pady=5, sticky="w")
-        picture_path_label = tk.Label(input_frame, text=pet['picture_path'] or "No file selected", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41")
+        tk.Label(input_frame, text="Upload Picture", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        picture_path_label = tk.Label(input_frame, text=pet['picture_path'] or "No file selected", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41")
         picture_path_label.grid(row=3, column=1, padx=10, pady=5)
         upload_button = tk.Button(input_frame, text="Upload Picture", command=lambda: self.upload_picture(picture_path_label), font=("Century Gothic", 15), bg="#EDCC6F", fg="#2B2C41")
         upload_button.grid(row=4, column=1, padx=10, pady=5)
@@ -666,7 +666,7 @@ class PetServiceManagementSystem:
         tk.Label(self.frame, text="GROOMING SERVICES", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
         # Create a scrollable frame for grooming services
-        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=900, height=500, bd=0)
+        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=500, height=500, bd=0)
         self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
         self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
         
@@ -675,7 +675,7 @@ class PetServiceManagementSystem:
             lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=500)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -731,7 +731,7 @@ class PetServiceManagementSystem:
             tk.Label(self.scrollable_frame, text="No grooming appointments found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
 
         # Back button centered at the bottom
-        back_button_frame = tk.Frame(self.frame, bg="#D2EBFF")  # Create a frame for the back button
+        back_button_frame = tk.Frame(self.scrollable_frame, bg="#D2EBFF")  # Create a frame for the back button
         back_button_frame.pack(pady=20)  # Add padding around the button frame
         tk.Button(back_button_frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
                 bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
@@ -779,7 +779,7 @@ class PetServiceManagementSystem:
         tk.Label(self.frame, text="DAYCARE BOOKING", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
         # Create a scrollable frame for daycare bookings
-        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=900, height=500, bd=0)
+        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=500, height=500, bd=0)
         self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
         self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
         
@@ -788,7 +788,7 @@ class PetServiceManagementSystem:
             lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=500)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -863,7 +863,7 @@ class PetServiceManagementSystem:
         appointments = db.get_daycare_appointments(username, status="Pending")  # Fetch only pending appointments
         if appointments:
             for i, appointment in enumerate(appointments):
-                tk.Label(self.scrollable_frame, text=f"{i + 1}. {appointment['pet_name']} - {appointment['date']}", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5)
+                tk.Label(self.scrollable_frame, text=f"{i + 1}. {appointment['pet_name']} - {appointment['date']}", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
                 tk.Button(
                     self.scrollable_frame,
                     text="Cancel",
@@ -876,7 +876,7 @@ class PetServiceManagementSystem:
             tk.Label(self.scrollable_frame, text="No daycare appointments found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
 
         # Back button centered at the bottom
-        back_button_frame = tk.Frame(self.frame, bg="#FFFFED")  # Create a frame for the back button
+        back_button_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED")  # Create a frame for the back button
         back_button_frame.pack(pady=20)  # Add padding around the button frame
         tk.Button(back_button_frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
                 bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
@@ -946,7 +946,7 @@ class PetServiceManagementSystem:
         lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=900)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -978,7 +978,7 @@ class PetServiceManagementSystem:
                 tk.Label(self.scrollable_frame, text="No daycare services found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5, anchor="w")
 
     # Back button centered at the bottom
-        back_button_frame = tk.Frame(self.frame, bg="#FFFFED")  # Create a frame for the back button
+        back_button_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED")  # Create a frame for the back button
         back_button_frame.pack(pady=20)  # Add padding around the button frame
         tk.Button(back_button_frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
               bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
@@ -991,28 +991,28 @@ class PetServiceManagementSystem:
         tk.Label(self.frame, text="💖 ADD PET 💖", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
         # Create a frame for the input fields
-        input_frame = tk.Frame(self.frame, bg="#D2EBFF")  # Frame for input fields
+        input_frame = tk.Frame(self.frame, bg="#FFFFED")  # Frame for input fields
         input_frame.pack(pady=20, padx=30)  # Add padding around the input frame
 
         # Name input
-        tk.Label(input_frame, text="Name", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=0, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(input_frame, text="Name", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=0, column=0, padx=10, pady=5, sticky="w")
         pet_name = tk.Entry(input_frame, font=("Century Gothic", 15))
         pet_name.grid(row=0, column=1, padx=10, pady=5)
 
         # Species input
-        tk.Label(input_frame, text="Species", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(input_frame, text="Species", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=1, column=0, padx=10, pady=5, sticky="w")
         species_options = ["Dog", "Cat"]
         pet_species = Combobox(input_frame, values=species_options, state="readonly", font=("Century Gothic", 15))
         pet_species.grid(row=1, column=1, padx=10, pady=5)
 
         # Age input
-        tk.Label(input_frame, text="Age", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(input_frame, text="Age", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=2, column=0, padx=10, pady=5, sticky="w")
         pet_age = tk.Entry(input_frame, font=("Century Gothic", 15))
         pet_age.grid(row=2, column=1, padx=10, pady=5)
 
         # Upload Picture
-        tk.Label(input_frame, text="Upload Picture", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=3, column=0, padx=10, pady=5, sticky="w")
-        picture_path_label = tk.Label(input_frame, text="No file selected", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41")
+        tk.Label(input_frame, text="Upload Picture", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        picture_path_label = tk.Label(input_frame, text="No file selected", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41")
         picture_path_label.grid(row=3, column=1, padx=10, pady=5)
         upload_button = tk.Button(input_frame, text="Upload Picture", command=lambda: self.upload_picture(picture_path_label), font=("Century Gothic", 15), bg="#EDCC6F", fg="#2B2C41")
         upload_button.grid(row=4, column=1, padx=10, pady=5)
