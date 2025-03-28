@@ -27,7 +27,7 @@ def connect_db():
             FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
         );
         """)
-        
+
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS grooming_services (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,20 +40,6 @@ def connect_db():
         );
         """)
 
-        # Create Service History Table
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS service_history (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            pet_name TEXT NOT NULL,
-            service_type TEXT NOT NULL,
-            date TEXT NOT NULL,
-            details TEXT,
-            status TEXT DEFAULT 'Pending',
-            FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-        );
-        """)
-        
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS admin (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -173,11 +159,11 @@ def delete_pet(user_id, pet_name):
         conn = sqlite3.connect('Systemdb.db')
         cursor = conn.cursor()
 
-        # Delete related records from service_history
-        cursor.execute("DELETE FROM service_history WHERE user_id = ? AND pet_name = ?", (user_id, pet_name))
-
         # Delete related records from grooming_services
         cursor.execute("DELETE FROM grooming_services WHERE user_id = ? AND pet_name = ?", (user_id, pet_name))
+
+        # Delete related records from daycare_bookings
+        cursor.execute("DELETE FROM daycare_bookings WHERE user_id = ? AND pet_name = ?", (user_id, pet_name))
 
         # Delete the pet itself
         cursor.execute("DELETE FROM pets WHERE user_id = ? AND name = ?", (user_id, pet_name))
@@ -220,7 +206,7 @@ def delete_user(user_id):
         # Optionally, you can also delete related pets and services if needed
         cursor.execute("DELETE FROM pets WHERE user_id = ?", (user_id,))
         cursor.execute("DELETE FROM grooming_services WHERE user_id = ?", (user_id,))
-        cursor.execute("DELETE FROM service_history WHERE user_id = ?", (user_id,))
+        cursor.execute("DELETE FROM daycare_bookings WHERE user_id = ?", (user_id,))
         
         conn.commit()
     except sqlite3.Error as e:
@@ -374,7 +360,7 @@ def get_grooming_services_done():
         """)
         columns = [column[0] for column in cursor.description]
         return [dict(zip(columns, row)) for row in cursor.fetchall()]
- 
+
 def get_daycare_services_done():
     """Retrieve all daycare bookings with status 'Done'."""
     with sqlite3.connect('Systemdb.db') as conn:
@@ -592,9 +578,9 @@ def get_all_done_services():
 
         # Fetch daycare services with status 'Done'
         cursor.execute("""
-            SELECT pet_name, service_type, date, details
-            FROM service_history
-            WHERE service_type = 'Daycare' AND status = 'Done'
+            SELECT pet_name, 'Daycare' AS service_type, date, NULL AS details
+            FROM daycare_bookings
+            WHERE status = 'Done'
         """)
         daycare_services = [
             {"pet_name": row[0], "service_type": row[1], "date": row[2], "details": row[3]}
