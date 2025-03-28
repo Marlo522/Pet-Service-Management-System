@@ -3,71 +3,72 @@ import random
 import os  # Import os module for path handling
 
 def connect_db():
-    with sqlite3.connect('Systemdb.db') as conn:
-        cursor = conn.cursor()
-        cursor.execute("PRAGMA foreign_keys = ON;")
+    conn = sqlite3.connect('Systemdb.db')
+    cursor = conn.cursor()
+    cursor.execute("PRAGMA foreign_keys = ON;")
 
-        # Create Users Table
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL
-        );
-        """)
+    # Create Users Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL
+    );
+    """)
 
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS pets (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            species TEXT NOT NULL,
-            age INTEGER,
-            picture_path TEXT,
-            FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-        );
-        """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS pets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        species TEXT NOT NULL,
+        age INTEGER,
+        picture_path TEXT,
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    );
+    """)
+    
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS grooming_services (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        pet_name TEXT NOT NULL,
+        service_type TEXT NOT NULL,
+        service_date TEXT NOT NULL,
+        status TEXT DEFAULT 'Pending',
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    );
+    """)
 
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS grooming_services (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            pet_name TEXT NOT NULL,
-            service_type TEXT NOT NULL,
-            service_date TEXT NOT NULL,
-            status TEXT DEFAULT 'Pending',
-            FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-        );
-        """)
+    # Create Service History Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS service_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        pet_name TEXT NOT NULL,
+        service_type TEXT NOT NULL,
+        date TEXT NOT NULL,
+        details TEXT,
+        status TEXT DEFAULT 'Pending',
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    );
+    """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS admin (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL
+    );
+    """)
 
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS admin (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL
-        );
-        """)
-
-        # Insert Predefined Admin Account if Not Exists
-        cursor.execute("SELECT COUNT(*) FROM admin WHERE username = ?", ("admin",))
-        if cursor.fetchone()[0] == 0:
-            cursor.execute("INSERT INTO admin (username, password) VALUES (?, ?)", ("admin", "admin"))
-
-        # Create daycare_bookings table if it doesn't exist
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS daycare_bookings (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                pet_name TEXT NOT NULL,
-                date TEXT NOT NULL,
-                drop_off_time TEXT NOT NULL,
-                pick_up_time TEXT NOT NULL,
-                status TEXT DEFAULT 'Pending',
-                FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-            );
-        """)
+    # Insert Predefined Admin Account if Not Exists
+    cursor.execute("SELECT COUNT(*) FROM admin WHERE username = ?", ("admin",))
+    if cursor.fetchone()[0] == 0:
+        cursor.execute("INSERT INTO admin (username, password) VALUES (?, ?)", ("admin", "admin"))
         conn.commit()
-        
+
+    conn.close()
+
 def insert_user(username, password):
     try:
         conn = sqlite3.connect('Systemdb.db')
@@ -159,11 +160,11 @@ def delete_pet(user_id, pet_name):
         conn = sqlite3.connect('Systemdb.db')
         cursor = conn.cursor()
 
+        # Delete related records from service_history
+        cursor.execute("DELETE FROM service_history WHERE user_id = ? AND pet_name = ?", (user_id, pet_name))
+
         # Delete related records from grooming_services
         cursor.execute("DELETE FROM grooming_services WHERE user_id = ? AND pet_name = ?", (user_id, pet_name))
-
-        # Delete related records from daycare_bookings
-        cursor.execute("DELETE FROM daycare_bookings WHERE user_id = ? AND pet_name = ?", (user_id, pet_name))
 
         # Delete the pet itself
         cursor.execute("DELETE FROM pets WHERE user_id = ? AND name = ?", (user_id, pet_name))
@@ -206,7 +207,7 @@ def delete_user(user_id):
         # Optionally, you can also delete related pets and services if needed
         cursor.execute("DELETE FROM pets WHERE user_id = ?", (user_id,))
         cursor.execute("DELETE FROM grooming_services WHERE user_id = ?", (user_id,))
-        cursor.execute("DELETE FROM daycare_bookings WHERE user_id = ?", (user_id,))
+        cursor.execute("DELETE FROM service_history WHERE user_id = ?", (user_id,))
         
         conn.commit()
     except sqlite3.Error as e:
@@ -335,70 +336,43 @@ def get_all_grooming_appointments():
     finally:
         conn.close()
 
-def get_grooming_services_done():
-    """Retrieve all grooming services with status 'Done'."""
-    with sqlite3.connect('Systemdb.db') as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT id, user_id, pet_name, service_type, service_date, status
-            FROM grooming_services
-            WHERE status = 'Done'
-            ORDER BY service_date DESC
-        """)
-        columns = [column[0] for column in cursor.description]
-        return [dict(zip(columns, row)) for row in cursor.fetchall()]
-
-def get_grooming_services_done():
-    """Retrieve all grooming services with status 'Done'."""
-    with sqlite3.connect('Systemdb.db') as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT id, user_id, pet_name, service_type, service_date, status
-            FROM grooming_services
-            WHERE status = 'Done'
-            ORDER BY service_date DESC
-        """)
-        columns = [column[0] for column in cursor.description]
-        return [dict(zip(columns, row)) for row in cursor.fetchall()]
-
-def get_daycare_services_done():
-    """Retrieve all daycare bookings with status 'Done'."""
-    with sqlite3.connect('Systemdb.db') as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT id, user_id, pet_name, date, drop_off_time, pick_up_time, status
-            FROM daycare_bookings
-            WHERE status = 'Done'
-            ORDER BY date DESC
-        """)
-        columns = [column[0] for column in cursor.description]
-        return [dict(zip(columns, row)) for row in cursor.fetchall()]
-
-def get_daycare_services_done_for_user(user_id):
-    """Retrieve all daycare bookings with status 'Done' for a specific user."""
-    with sqlite3.connect('Systemdb.db') as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT id, user_id, pet_name, date, drop_off_time, pick_up_time, status
-            FROM daycare_bookings
-            WHERE user_id = ? AND status = 'Done'
-            ORDER BY date DESC
-        """, (user_id,))
-        columns = [column[0] for column in cursor.description]
-        return [dict(zip(columns, row)) for row in cursor.fetchall()]
-
-def get_grooming_services_done_for_user(user_id):
+def get_grooming_services_done(user_id):
     """Retrieve all grooming services with status 'Done' for a specific user."""
-    with sqlite3.connect('Systemdb.db') as conn:
+    try:
+        conn = sqlite3.connect('Systemdb.db')
         cursor = conn.cursor()
-        cursor.execute("""
-            SELECT id, user_id, pet_name, service_type, service_date, status
+        query = """
+            SELECT pet_name, service_type, service_date AS date
             FROM grooming_services
             WHERE user_id = ? AND status = 'Done'
             ORDER BY service_date DESC
-        """, (user_id,))
-        columns = [column[0] for column in cursor.description]
-        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+        """
+        cursor.execute(query, (user_id,))
+        return [{"pet_name": row[0], "service_type": row[1], "date": row[2]} for row in cursor.fetchall()]
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")  # Debugging output
+        return []
+    finally:
+        conn.close()
+ 
+def get_daycare_services_done(user_id):
+    """Retrieve all daycare services with status 'Done' for a specific user."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        query = """
+            SELECT pet_name, service_type, date, details
+            FROM service_history
+            WHERE user_id = ? AND service_type = 'Daycare' AND status = 'Done'
+            ORDER BY date DESC
+        """
+        cursor.execute(query, (user_id,))
+        return [{"pet_name": row[0], "service_type": row[1], "date": row[2], "details": row[3]} for row in cursor.fetchall()]
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")  # Debugging output
+        return []
+    finally:
+        conn.close()
 
 def get_service_history(user_id):
     """Retrieve all service history for a specific user."""
@@ -464,32 +438,50 @@ def get_all_service_history():
         return history
     finally:
         conn.close()
-
 def get_daycare_appointments(username, status=None):
-    """Retrieve daycare bookings for a specific user."""
-    with sqlite3.connect('Systemdb.db') as conn:
+    """Retrieve all daycare appointments for a specific user with optional status filter."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
         cursor = conn.cursor()
-        cursor.execute("""
-            SELECT id, pet_name, date, drop_off_time, pick_up_time, status
-            FROM daycare_bookings
-            WHERE user_id = (SELECT id FROM users WHERE username = ?)
-            AND (? IS NULL OR status = ?)
-            ORDER BY date DESC
-        """, (username, status, status))
-        columns = [column[0] for column in cursor.description]
-        appointments = [dict(zip(columns, row)) for row in cursor.fetchall()]
-    return appointments
+
+        # Get user ID from username
+        cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
+        user = cursor.fetchone()
+        if not user:
+            return []
+
+        user_id = user[0]
+
+        # Fetch daycare appointments for the user
+        query = """
+            SELECT id, pet_name, service_type, date, details
+            FROM service_history
+            WHERE user_id = ? AND service_type = 'Daycare' AND status = 'Pending'
+        """
+        params = [user_id]
+        if status:
+            query += " AND status = ?"
+            params.append(status)
+
+        cursor.execute(query, params)
+        appointments = [
+            {"id": row[0], "pet_name": row[1], "service_type": row[2], "date": row[3] , "details": row[4]}
+            for row in cursor.fetchall()
+        ]
+        return appointments
+    finally:
+        conn.close()
+
 
 def cancel_daycare_appointment(appointment_id):
-    """Cancel a daycare appointment."""
-    with sqlite3.connect('Systemdb.db') as conn:
+    """Cancel a daycare appointment by its ID."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
         cursor = conn.cursor()
-        cursor.execute("""
-            DELETE FROM daycare_bookings
-            WHERE id = ?
-        """, (appointment_id,))
+        cursor.execute("DELETE FROM service_history WHERE id = ?", (appointment_id,))
         conn.commit()
-
+    finally:
+        conn.close()
 def update_pet_name_in_service_history(user_id, old_name, new_name):
     """Update the pet name in the service history table."""
     try:
@@ -548,16 +540,18 @@ def update_grooming_status(appointment_id, new_status):
 
 def get_all_daycare_booking():
     """Retrieve all daycare bookings for admin view."""
-    with sqlite3.connect('Systemdb.db') as conn:
+    try:
+        conn = sqlite3.connect('Systemdb.db')
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT id, user_id, pet_name, date, drop_off_time, pick_up_time, status
-            FROM daycare_bookings
+            SELECT *
+            FROM service_history
+            WHERE service_type = 'Daycare'
             ORDER BY date DESC
         """)
-        columns = [column[0] for column in cursor.description]
-        bookings = [dict(zip(columns, row)) for row in cursor.fetchall()]
-    return bookings
+        conn.commit()
+    finally:
+        conn.close()
 
 def get_all_done_services():
     """Retrieve all grooming and daycare services with status 'Done'."""
@@ -578,9 +572,9 @@ def get_all_done_services():
 
         # Fetch daycare services with status 'Done'
         cursor.execute("""
-            SELECT pet_name, 'Daycare' AS service_type, date, NULL AS details
-            FROM daycare_bookings
-            WHERE status = 'Done'
+            SELECT pet_name, service_type, date, details
+            FROM service_history
+            WHERE service_type = 'Daycare' AND status = 'Done'
         """)
         daycare_services = [
             {"pet_name": row[0], "service_type": row[1], "date": row[2], "details": row[3]}
@@ -590,24 +584,3 @@ def get_all_done_services():
         return grooming_services + daycare_services
     finally:
         conn.close()
-
-def add_daycare_booking(user_id, pet_name, date, drop_off_time, pick_up_time, status):
-    """Add a daycare booking to the database."""
-    with sqlite3.connect('Systemdb.db') as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO daycare_bookings (user_id, pet_name, date, drop_off_time, pick_up_time, status)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (user_id, pet_name, date, drop_off_time, pick_up_time, status))
-        conn.commit()
-
-def update_daycare_status(booking_id, status):
-    """Update the status of a daycare booking."""
-    with sqlite3.connect('Systemdb.db') as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            UPDATE daycare_bookings
-            SET status = ?
-            WHERE id = ?
-        """, (status, booking_id))
-        conn.commit()

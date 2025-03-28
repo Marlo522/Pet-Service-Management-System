@@ -24,7 +24,7 @@ class PetServiceManagementSystem:
         # Initialize the main window and set up the layout
         self.window = window
         self.window.title("PET SERVICE MANAGEMENT SYSTEM")
-        self.window.geometry("1200x700")
+        self.window.geometry("900x700")
         self.window.configure(bg="#D2EBFF")
 
         # Title label
@@ -33,10 +33,7 @@ class PetServiceManagementSystem:
         # Main frame for buttons
         self.frame = tk.Frame(self.window, bg="#FFFFED")
         self.frame.pack(padx=70, pady=70)
-        
-        # Title label
-        tk.Label(self.frame, text="✨ Hello, Welcome! ✨", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(padx=20, pady=20)
-        
+
         # Create a box frame for User and Admin buttons
         button_box = tk.Frame(self.frame, bg="#FFFFED", bd=2)
         button_box.pack(pady=20, padx=20)
@@ -73,7 +70,7 @@ class PetServiceManagementSystem:
         # Title label
         tk.Label(inner, text="🦴 USER LOGIN 🦴", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(padx=20, pady=20)
 
-        # Create buttons
+        # Create buttons with the specified styles
         tk.Button(inner, text="Login", command=self.UserLogIn, **self.button_style).pack(pady=5)
         tk.Button(inner, text="Create Account", command=self.UserRegister, **self.button_style).pack(pady=5)
         tk.Button(inner, text="Back", command=self.back_to_main, **self.button_style).pack(pady=5)
@@ -123,17 +120,17 @@ class PetServiceManagementSystem:
         button_box = tk.Frame(self.frame, bg="#FFFFED", bd=0)  # Create a frame with a border
         button_box.pack(pady=20, padx=70)
 
-        # Management option buttons
+        # Management option buttons with updated font and style
         tk.Button(button_box, text="Manage Users", command=self.manage_all_users, font=("Century Gothic", 15), 
-                bg="#EDCC6F", fg="#2B2C41", width=30).pack(pady=5)
+                bg="#EDCC6F", fg="#2B2C41", width=25).pack(pady=5)
         tk.Button(button_box, text="Manage Pets", command=self.manage_all_pets, font=("Century Gothic", 15), 
-                bg="#EDCC6F", fg="#2B2C41", width=30).pack(pady=5)
+                bg="#EDCC6F", fg="#2B2C41", width=25).pack(pady=5)
         tk.Button(button_box, text="Manage Grooming Appointments", command=self.manage_grooming_appointments, font=("Century Gothic", 15), 
-                bg="#EDCC6F", fg="#2B2C41", width=30).pack(pady=5)
+                bg="#EDCC6F", fg="#2B2C41", width=25).pack(pady=5)
         tk.Button(button_box, text="Manage Daycare Booking", command=self.manage_daycare_booking, font=("Century Gothic", 15), 
-                bg="#EDCC6F", fg="#2B2C41", width=30).pack(pady=5)
+                bg="#EDCC6F", fg="#2B2C41", width=25).pack(pady=5)
         tk.Button(button_box, text="View Service History", command=self.view_service_history, font=("Century Gothic", 15), 
-                bg="#EDCC6F", fg="#2B2C41", width=30).pack(pady=5)
+                bg="#EDCC6F", fg="#2B2C41", width=25).pack(pady=5)
 
         # Back button
         tk.Button(self.frame, text="Back", command=self.back_to_main, font=("Century Gothic", 15), 
@@ -168,29 +165,29 @@ class PetServiceManagementSystem:
         # Display and manage all registered users
         self.clear_frame()
         
-        # Title label
-        tk.Label(self.frame, text="👥 MANAGE USERS 👥", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
+        # Title label with updated font and color
+        tk.Label(self.frame, text="👥 MANAGE USERS 👥", font=("Century Gothic", 20, "bold"), bg="#D2EBFF", fg="#2B2C41").pack(pady=20)
 
         # Create a box frame for user management
-        user_box = tk.Frame(self.frame, bg="#FFFFED", bd=0)  # Create a frame without a border
+        user_box = tk.Frame(self.frame, bg="#D2EBFF", bd=0)  # Create a frame without a border
         user_box.pack(pady=20, padx=30)
 
         users = db.get_all_users()  # Fetch all users from the database
         if users:
             for user in users:
-                user_frame = tk.Frame(user_box, bg="#FFFFED", bd=0)  # Frame for each user
+                user_frame = tk.Frame(user_box, bg="#D2EBFF", bd=0)  # Frame for each user
                 user_frame.pack(fill=tk.X, padx=10, pady=5)
 
                 details = f"ID: {user['id']}, Username: {user['username']}"
-                tk.Label(user_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(side=tk.LEFT, padx=10)
+                tk.Label(user_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(side=tk.LEFT, padx=10)
 
-                # Button to delete the user
+                # Button to delete the user with updated style
                 tk.Button(user_frame, text="Delete", command=lambda user_id=user['id']: self.delete_user(user_id), 
                         font=("Century Gothic", 15), bg="#EDCC6F", fg="#2B2C41").pack(side=tk.RIGHT, padx=10)
         else:
-            tk.Label(self.frame, text="No users found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
+            tk.Label(self.frame, text="No users found.", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=10)
 
-        # Back button
+        # Back button with updated style
         tk.Button(self.frame, text="Back", command=self.load_admin_dashboard, font=("Century Gothic", 15), 
                 bg="#EDCC6F", fg="#2B2C41").pack(pady=20)
     
@@ -198,27 +195,27 @@ class PetServiceManagementSystem:
         # Display and manage all registered pets
         self.clear_frame()
         
-        # Title label
-        tk.Label(self.frame, text="🐕 MANAGE PETS 🐈", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
+        # Title label with updated font and color
+        tk.Label(self.frame, text="🐕 MANAGE PETS 🐈", font=("Century Gothic", 20, "bold"), bg="#D2EBFF", fg="#2B2C41").pack(pady=20)
 
         # Create a box frame for pets
-        pet_box = tk.Frame(self.frame, bg="#FFFFED", bd=0)  # Create a frame without a border
+        pet_box = tk.Frame(self.frame, bg="#D2EBFF", bd=0)  # Create a frame without a border
         pet_box.pack(pady=20, padx=30)
 
         pets = db.get_all_pets()  # Fetch all pets from the database
         if pets:
             for pet in pets:
-                pet_frame = tk.Frame(pet_box, bg="#FFFFED", bd=0)  # Frame for each pet
+                pet_frame = tk.Frame(pet_box, bg="#D2EBFF", bd=0)  # Frame for each pet
                 pet_frame.pack(fill=tk.X, padx=10, pady=5)
 
                 details = f"Name: {pet['name']}, Species: {pet['species']}, Owner ID: {pet['user_id']}"
-                tk.Label(pet_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(side=tk.LEFT, padx=10)
+                tk.Label(pet_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(side=tk.LEFT, padx=10)
 
                 # Button to delete the pet
                 tk.Button(pet_frame, text="Delete", command=lambda pet_name=pet['name'], user_id=pet['user_id']: self.delete_pet(user_id, pet_name), 
                         font=("Century Gothic", 15), bg="#EDCC6F", fg="#2B2C41").pack(side=tk.RIGHT, padx=10)
         else:
-            tk.Label(self.frame, text="No pets found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
+            tk.Label(self.frame, text="No pets found.", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=10)
 
         # Back button
         tk.Button(self.frame, text="Back", command=self.load_admin_dashboard, font=("Century Gothic", 15), 
@@ -243,65 +240,61 @@ class PetServiceManagementSystem:
             messagebox.showerror("Error", f"Failed to delete pet: {e}")
 
     def manage_daycare_booking(self):
-        # Display and manage daycare bookings
+        # Display and manage daycare booking records
         self.clear_frame()
-    
-        # Title label
-        tk.Label(self.frame, text="📖 MANAGE DAYCARE BOOKINGS 📖", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
-    
+        
+        # Title label with updated font and color
+        tk.Label(self.frame, text="📖 MANAGE DAYCARE BOOKING 📖", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
+
         # Create a scrollable frame for daycare bookings
-        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=900, height=500)
-        self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
+        self.canvas = tk.Canvas(self.frame, bg="#D2EBFF")
+        self.scrollable_frame = tk.Frame(self.canvas, bg="#D2EBFF")
         self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
-    
+        
         self.scrollable_frame.bind(
             "<Configure>",
             lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
-    
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=900)
+
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
-    
+
         self.canvas.pack(side="left", fill="both", expand=True)
         self.scrollbar.pack(side="right", fill="y")
-    
-        # Fetch all daycare bookings with status = 'Pending'
-        bookings = db.get_all_daycare_booking()
-        pending_bookings = [booking for booking in bookings if booking["status"] == "Pending"]
-    
-        if pending_bookings:
-            for booking in pending_bookings:
-                booking_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED", bd=0)  # Frame for each booking
-                booking_frame.pack(fill=tk.X, padx=10, pady=5)
-    
+
+        # Fetch all daycare bookings
+        history = db.get_all_daycare_booking()
+        if history:
+            for record in history:
+                record_frame = tk.Frame(self.scrollable_frame, bg="#D2EBFF", bd=0)  # Frame for each booking
+                record_frame.pack(fill=tk.X, padx=10, pady=5)
+
                 details = (
-                    f"ID: {booking['id']} | "
-                    f"User ID: {booking['user_id']} | "
-                    f"Pet: {booking['pet_name']} | "
-                    f"Date: {booking['date']} | "
-                    f"Drop-off: {booking['drop_off_time']} | "
-                    f"Pick-up: {booking['pick_up_time']} | "
-                    f"Status: {booking['status']}"
+                    f"ID: {record['id']} | "
+                    f"Pet: {record['pet_name']} | "
+                    f"Service: {record['service_type']} | "
+                    f"Date: {record['date']} | "
+                    f"Details: {record['details']} | "
+                    f"Status: {record['status']}"
                 )
-                tk.Label(booking_frame, text=details, justify="left", font=("Century Gothic", 10), bg="#FFFFED", fg="#2B2C41").pack(side=tk.LEFT, padx=10)
-    
-                # Button to mark the booking as "Done"
-                tk.Button(
-                    booking_frame,
-                    text="Mark as Done",
-                    command=lambda booking_id=booking['id']: self.update_daycare_status(booking_id),
-                    font=("Century Gothic", 10),
-                    bg="#EDCC6F",
-                    fg="#2B2C41"
-                ).pack(side=tk.RIGHT, padx=10)
+                tk.Label(record_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(side=tk.LEFT, padx=10)
+
+                # Button to mark the service as done with updated style
+                if record["status"] == "Pending":
+                    tk.Button(
+                        record_frame,
+                        text="Mark as Done",
+                        command=lambda record_id=record['id']: self.update_service_status(record_id),
+                        font=("Century Gothic", 15),
+                        bg="#EDCC6F",
+                        fg="#2B2C41"
+                    ).pack(side=tk.RIGHT, padx=10)
         else:
-            tk.Label(self.scrollable_frame, text="No pending daycare bookings found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
-    
-        # Back button centered at the bottom
-        back_button_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED")  # Create a frame for the back button
-        back_button_frame.pack(pady=20)
-        tk.Button(back_button_frame, text="Back", command=self.load_admin_dashboard, font=("Century Gothic", 15), 
-                  bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
+            tk.Label(self.scrollable_frame, text="No daycare bookings found.", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=10)
+
+        # Back button with updated style
+        tk.Button(self.frame, text="Back", command=self.load_admin_dashboard, font=("Century Gothic", 15), 
+                bg="#EDCC6F", fg="#2B2C41").pack(pady=20)
     
     def manage_grooming_appointments(self):
         # Display and manage grooming appointments
@@ -311,8 +304,8 @@ class PetServiceManagementSystem:
         tk.Label(self.frame, text="📖 MANAGE GROOMING APPOINTMENTS 📖", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
         # Create a scrollable frame for grooming appointments
-        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=900, height=500)
-        self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
+        self.canvas = tk.Canvas(self.frame, bg="#D2EBFF", width=1250, height=1000)
+        self.scrollable_frame = tk.Frame(self.canvas, bg="#D2EBFF")
         self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
         
         self.scrollable_frame.bind(
@@ -320,7 +313,7 @@ class PetServiceManagementSystem:
             lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=900)
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -332,7 +325,7 @@ class PetServiceManagementSystem:
 
         if pending_appointments:
             for appointment in pending_appointments:
-                appointment_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED", bd=0)  # Frame for each appointment
+                appointment_frame = tk.Frame(self.scrollable_frame, bg="#D2EBFF", bd=0)  # Frame for each appointment
                 appointment_frame.pack(fill=tk.X, padx=10, pady=5)
 
                 details = (
@@ -343,7 +336,7 @@ class PetServiceManagementSystem:
                     f"Date: {appointment['service_date']} | "
                     f"Status: {appointment['status']}"
                 )
-                tk.Label(appointment_frame, text=details, justify="left", font=("Century Gothic", 10), bg="#FFFFED", fg="#2B2C41").pack(side=tk.LEFT, padx=10)
+                tk.Label(appointment_frame, text=details, justify="left", font=("Century Gothic", 10), bg="#D2EBFF", fg="#2B2C41").pack(side=tk.LEFT, padx=10)
 
                 # Button to mark the appointment as "Done"
                 tk.Button(
@@ -355,11 +348,11 @@ class PetServiceManagementSystem:
                     fg="#2B2C41"
                 ).pack(side=tk.RIGHT, padx=10)
         else:
-            tk.Label(self.scrollable_frame, text="No pending grooming appointments found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
+            tk.Label(self.scrollable_frame, text="No pending grooming appointments found.", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=10)
 
         # Back button centered at the bottom
-        back_button_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED")  # Create a frame for the back button
-        back_button_frame.pack(pady=20)
+        back_button_frame = tk.Frame(self.frame, bg="#D2EBFF")  # Create a frame for the back button
+        back_button_frame.pack(pady=20)  # Add padding around the button frame
         tk.Button(back_button_frame, text="Back", command=self.load_admin_dashboard, font=("Century Gothic", 15), 
                 bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
 
@@ -373,92 +366,59 @@ class PetServiceManagementSystem:
             messagebox.showerror("Error", f"Failed to update appointment status: {e}")
 
     def update_service_status(self, record_id):
-        """Update the status of a daycare booking to 'Done'."""
+        # Update the status of a service record to 'Done'.
         try:
-            db.update_daycare_status(record_id, "Done")
-            messagebox.showinfo("Success", "Daycare booking marked as 'Done'!")
-            self.manage_daycare_booking()  # Refresh the daycare bookings menu
+            db.update_service_status(record_id, "Done")
+            messagebox.showinfo("Success", "Service status updated to 'Done'!")
+            self.manage_daycare_booking()  # Refresh the service history
         except Exception as e:
             messagebox.showerror("Error", f"Failed to update status: {e}")
-    
-    def update_daycare_status(self, booking_id):
-        # Mark a daycare booking as 'Done'
-        try:
-            db.update_daycare_status(booking_id, "Done")
-            messagebox.showinfo("Success", "Daycare booking marked as 'Done'!")
-            self.manage_daycare_booking()  # Refresh the daycare bookings menu
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to update booking status: {e}")
 
     def view_service_history(self):
-        # Display the service history for all users
+        """Display the service history for all users."""
         self.clear_frame()
-    
-        # Title label
-        tk.Label(self.frame, text="🔎 SERVICE HISTORY 🔍", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
-    
+        
+        # Title label with updated font and color
+        tk.Label(self.frame, text="SERVICE HISTORY", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
+
         # Create a scrollable frame for service history
-        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=1100, height=500)
-        self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
+        self.canvas = tk.Canvas(self.frame, bg="#D2EBFF")
+        self.scrollable_frame = tk.Frame(self.canvas, bg="#D2EBFF")
         self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
-    
-        # Configure the canvas to scroll properly
+        
         self.scrollable_frame.bind(
             "<Configure>",
             lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw", width=1100)
+
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
-    
-        # Pack the canvas and scrollbar
-        self.scrollbar.pack(side="right", fill="y")
+
         self.canvas.pack(side="left", fill="both", expand=True)
-    
-        # Fetch grooming and daycare services with status 'Done'
-        grooming_history = db.get_grooming_services_done()
-        daycare_history = db.get_daycare_services_done()
-    
-        if not grooming_history and not daycare_history:
-            tk.Label(self.scrollable_frame, text="No service history found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
+        self.scrollbar.pack(side="right", fill="y")
+
+        # Fetch all service history records
+        history = db.get_all_service_history()
+        if not history:
+            tk.Label(self.scrollable_frame, text="No service history found.", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=10)
         else:
-            # Display Grooming Services
-            if grooming_history:
-                tk.Label(self.scrollable_frame, text="Grooming Services", font=("Century Gothic", 20), bg="#FFFFED", fg="#2B2C41").pack(pady=20, anchor="w")
-                for record in grooming_history:
-                    details = f"Pet: {record['pet_name']} | Date: {record['service_date']} | Service: {record['service_type']}"
-                    tk.Label(
-                        self.scrollable_frame,
-                        text=details,
-                        justify="left",
-                        font=("Century Gothic", 15),
-                        bg="#FFFFED",
-                        fg="#2B2C41",
-                        wraplength=1000,  # Allow text to wrap within 1000 pixels
-                        anchor="w"
-                    ).pack(pady=5, anchor="w")
-    
-            # Display Daycare Services
-            if daycare_history:
-                tk.Label(self.scrollable_frame, text="Daycare Services", font=("Century Gothic", 20), bg="#FFFFED", fg="#2B2C41").pack(pady=20, anchor="w")
-                for record in daycare_history:
-                    details = f"Pet: {record['pet_name']} | Date: {record['date']} | Drop-off: {record['drop_off_time']} | Pick-up: {record['pick_up_time']}"
-                    tk.Label(
-                        self.scrollable_frame,
-                        text=details,
-                        justify="left",
-                        font=("Century Gothic", 15),
-                        bg="#FFFFED",
-                        fg="#2B2C41",
-                        wraplength=1000,  # Allow text to wrap within 1000 pixels
-                        anchor="w"
-                    ).pack(pady=5, anchor="w")
-    
+            for record in history:
+                details = (
+                    f"ID: {record['id']} | "
+                    f"Pet: {record['pet_name']} | "
+                    f"Service: {record['service_type']} | "
+                    f"Date: {record['date']} | "
+                    f"Details: {record['details']} | "
+                    f"Status: {record['status']}"
+                )
+                tk.Label(self.scrollable_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5)
+
         # Back button centered at the bottom
-        back_button_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED")  # Create a frame for the back button
-        back_button_frame.pack(pady=20)
+        back_button_frame = tk.Frame(self.frame, bg="#D2EBFF")  # Create a frame for the back button
+        back_button_frame.pack(pady=20)  # Add padding around the button frame
         tk.Button(back_button_frame, text="Back", command=self.load_admin_dashboard, font=("Century Gothic", 15), 
-                  bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
-        
+                bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
+
     def UserLogIn(self):
         # Display the user login interface.
         self.clear_frame()
@@ -520,7 +480,7 @@ class PetServiceManagementSystem:
             messagebox.showwarning("Input Error", "Please fill in all fields.")
 
     def Login(self, username, password):
-        # Validate user login credentials
+        # Validate user login credentials.
         if username and password:
             print(f"Attempting login for: {username}")  # Debugging output
             if db.validate_user(username, password):
@@ -533,23 +493,23 @@ class PetServiceManagementSystem:
             messagebox.showwarning("Input Error", "Please enter both username and password.")
 
     def ManageMyPets(self, username):
-    # Manage the user's pets, including viewing, editing, and deleting pets
+        # Manage the user's pets, including viewing, editing, and deleting pets.
         self.clear_frame()
-    
-    # Title label
-        tk.Label(self.frame, text="🥫 MANAGE MY PETS 🥫", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
+        
+        # Title label with updated font and color
+        tk.Label(self.frame, text="MANAGE MY PETS", font=("Century Gothic", 24), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
-    # Create a scrollable frame for pets
-        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=500, height=500, bd=0)
-        self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
+        # Create a scrollable frame for pets
+        self.canvas = tk.Canvas(self.frame, bg="#D2EBFF")
+        self.scrollable_frame = tk.Frame(self.canvas, bg="#D2EBFF")
         self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
-    
+        
         self.scrollable_frame.bind(
-        "<Configure>",
-        lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-    )
+            "<Configure>",
+            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        )
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=500)
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -558,49 +518,42 @@ class PetServiceManagementSystem:
         pets = db.get_user_pets(username)
         if pets:
             for pet in pets:
-                pet_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED", bd=1, relief="solid")  # Frame for each pet
-                pet_frame.pack(fill=tk.X, padx=10, pady=10)
+                pet_frame = tk.Frame(self.scrollable_frame, bg="#D2EBFF", bd=0)  # Frame for each pet
+                pet_frame.pack(fill=tk.X, padx=10, pady=5)
 
-            # Display pet details
-                details_frame = tk.Frame(pet_frame, bg="#FFFFED")
-                details_frame.pack(side=tk.LEFT, padx=10, pady=10)
+                # Display pet details
+                details = f"Name: {pet['name']} | Species: {pet['species']} | Age: {pet['age']}"
+                tk.Label(pet_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(side=tk.LEFT, padx=10)
 
-                details = f"Name: {pet['name']}\nSpecies: {pet['species']}\nAge: {pet['age']}"
-                tk.Label(details_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(anchor="w")
-
-            # Display pet image
-                image_frame = tk.Frame(pet_frame, bg="#FFFFED")
-                image_frame.pack(side=tk.RIGHT, padx=10, pady=10)
+                # Display pet image
                 try:
                     if pet["picture_path"]:
                         pil_image = Image.open(pet["picture_path"]).resize((100, 100), Image.LANCZOS)
                         image = ImageTk.PhotoImage(pil_image)
-                        image_label = tk.Label(image_frame, image=image, bg="#FFFFED")
+                        image_label = tk.Label(pet_frame, image=image)
                         image_label.image = image  # Keep a reference to avoid garbage collection
-                        image_label.pack()
+                        image_label.pack(side=tk.RIGHT, padx=10)
                     else:
-                        tk.Label(image_frame, text="No Image", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack()
+                        tk.Label(pet_frame, text="No Image", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(side=tk.RIGHT, padx=10)
                 except Exception as e:
                     print(f"Error loading image: {e}")
-                    tk.Label(image_frame, text="Error Displaying Image", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack()
+                    tk.Label(pet_frame, text="Error Displaying Image", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(side=tk.RIGHT, padx=10)
 
-            # Add Edit and Delete buttons
-                button_frame = tk.Frame(pet_frame, bg="#FFFFED")
-                button_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=5)
-                tk.Button(button_frame, text="Edit", command=lambda pet=pet: self.EditPet(username, pet), font=("Century Gothic", 15), bg="#EDCC6F", fg="#2B2C41").pack(side=tk.LEFT, padx=5)
-                tk.Button(button_frame, text="Delete", command=lambda pet=pet: self.DeletePet(username, pet['name']), font=("Century Gothic", 15), bg="#EDCC6F", fg="#2B2C41").pack(side=tk.LEFT, padx=5)
+                # Add Edit and Delete buttons
+                tk.Button(pet_frame, text="Edit", command=lambda pet=pet: self.EditPet(username, pet), font=("Century Gothic", 15), bg="#EDCC6F", fg="#2B2C41").pack(side=tk.RIGHT, padx=5)
+                tk.Button(pet_frame, text="Delete", command=lambda pet=pet: self.DeletePet(username, pet['name']), font=("Century Gothic", 15), bg="#EDCC6F", fg="#2B2C41").pack(side=tk.RIGHT, padx=5)
         else:
-            tk.Label(self.scrollable_frame, text="No pets registered yet.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
+            tk.Label(self.scrollable_frame, text="No pets registered yet.", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5)
 
-    # Add Pet button
-        tk.Button(self.scrollable_frame, text="Add Pet", font=("Century Gothic", 15), command=lambda: self.AddPet(username), bg="#EDCC6F", fg="#2B2C41").pack(pady=10)
+        # Add Pet button
+        tk.Button(self.frame, text="Add Pet", font=("Century Gothic", 15), command=lambda: self.AddPet(username), bg="#EDCC6F", fg="#2B2C41").pack(pady=5)
 
-    # Back button
-        tk.Button(self.scrollable_frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
-              bg="#EDCC6F", fg="#2B2C41").pack(pady=10)
+        # Back button
+        tk.Button(self.frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
+                bg="#EDCC6F", fg="#2B2C41").pack(pady=10)
 
     def DeletePet(self, username, pet_name):
-        # Delete a pet from the user's account
+        # Delete a pet from the user's account.
         try:
             user_id = db.get_user_id(username)
             if not user_id:
@@ -612,45 +565,45 @@ class PetServiceManagementSystem:
             messagebox.showerror("Error", f"Failed to delete pet: {e}")
 
     def EditPet(self, username, pet):
-        # Edit the details of a pet
+        # Edit the details of a pet.
         self.clear_frame()
         
-        # Title label
-        tk.Label(self.frame, text="💕 EDIT PET 💕", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
+        # Title label with updated font and color
+        tk.Label(self.frame, text="EDIT PET", font=("Century Gothic", 24), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
         # Create a frame for the input fields
-        input_frame = tk.Frame(self.frame, bg="#FFFFED")  # Frame for input fields
-        input_frame.pack(pady=20, padx=30)
+        input_frame = tk.Frame(self.frame, bg="#D2EBFF")  # Frame for input fields
+        input_frame.pack(pady=20, padx=30)  # Add padding around the input frame
 
         # Name input
-        tk.Label(input_frame, text="Name", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=0, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(input_frame, text="Name", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=0, column=0, padx=10, pady=5, sticky="w")
         pet_name = tk.Entry(input_frame, font=("Century Gothic", 15))
         pet_name.insert(0, pet['name'])
         pet_name.grid(row=0, column=1, padx=10, pady=5)
 
         # Species input
-        tk.Label(input_frame, text="Species", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(input_frame, text="Species", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=1, column=0, padx=10, pady=5, sticky="w")
         species_options = ["Dog", "Cat"]
         pet_species = Combobox(input_frame, values=species_options, state="readonly", font=("Century Gothic", 15))
         pet_species.set(pet['species'])
         pet_species.grid(row=1, column=1, padx=10, pady=5)
 
         # Age input
-        tk.Label(input_frame, text="Age", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(input_frame, text="Age", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=2, column=0, padx=10, pady=5, sticky="w")
         pet_age = tk.Entry(input_frame, font=("Century Gothic", 15))
         pet_age.insert(0, pet['age'])
         pet_age.grid(row=2, column=1, padx=10, pady=5)
 
         # Upload Picture
-        tk.Label(input_frame, text="Upload Picture", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=3, column=0, padx=10, pady=5, sticky="w")
-        picture_path_label = tk.Label(input_frame, text=pet['picture_path'] or "No file selected", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41")
+        tk.Label(input_frame, text="Upload Picture", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        picture_path_label = tk.Label(input_frame, text=pet['picture_path'] or "No file selected", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41")
         picture_path_label.grid(row=3, column=1, padx=10, pady=5)
         upload_button = tk.Button(input_frame, text="Upload Picture", command=lambda: self.upload_picture(picture_path_label), font=("Century Gothic", 15), bg="#EDCC6F", fg="#2B2C41")
         upload_button.grid(row=4, column=1, padx=10, pady=5)
 
         # Save and Cancel buttons
-        button_frame = tk.Frame(self.frame, bg="#FFFFED")  # Create a frame for the buttons
-        button_frame.pack(pady=20)
+        button_frame = tk.Frame(self.frame, bg="#D2EBFF")  # Create a frame for the buttons
+        button_frame.pack(pady=20)  # Add padding around the button frame
 
         save_button = tk.Button(
             button_frame,
@@ -666,10 +619,10 @@ class PetServiceManagementSystem:
         back_button.pack(side=tk.LEFT, padx=10)
 
     def submit_edit_pet(self, username, old_name, new_name, new_species, new_age, new_picture_path=None):
-        # Submit the edited details of a pet to the database
+        # Submit the edited details of a pet to the database.
         try:
             # Validate input fields
-            if not all([username, new_name, new_species, new_age]) or new_picture_path == "No file selected":
+            if not all([username, new_name, new_species, new_age]):
                 raise ValueError("All fields are required.")
         
             # Validate and convert age
@@ -686,6 +639,7 @@ class PetServiceManagementSystem:
             db.edit_pet(user_id, old_name, new_name, new_species, new_age, new_picture_path)
         
             # Update pet name in service history, grooming services, and daycare
+            db.update_pet_name_in_service_history(user_id, old_name, new_name)
             db.update_pet_name_in_grooming_services(user_id, old_name, new_name)
             db.update_pet_name_in_daycare_services(user_id, old_name, new_name)
         
@@ -698,15 +652,15 @@ class PetServiceManagementSystem:
             messagebox.showerror("Error", f"Failed to update pet details: {e}")
 
     def GroomingServices(self, username):
-        # Manage grooming services for the user's pets
+        # Manage grooming services for the user's pets.
         self.clear_frame()
         
-        # Title label
-        tk.Label(self.frame, text="🎀 GROOMING SERVICES 🎀", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
+        # Title label with updated font and color
+        tk.Label(self.frame, text="GROOMING SERVICES", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
         # Create a scrollable frame for grooming services
-        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=500, height=500, bd=0)
-        self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
+        self.canvas = tk.Canvas(self.frame, bg="#D2EBFF")
+        self.scrollable_frame = tk.Frame(self.canvas, bg="#D2EBFF")
         self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
         
         self.scrollable_frame.bind(
@@ -714,7 +668,7 @@ class PetServiceManagementSystem:
             lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=500)
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -723,41 +677,43 @@ class PetServiceManagementSystem:
         # Fetch user's pets
         pets = db.get_user_pets(username)
         if not pets:
-            tk.Label(self.scrollable_frame, text="No pets registered. Please add a pet first.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
+            tk.Label(self.scrollable_frame, text="No pets registered. Please add a pet first.", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=10)
             tk.Button(self.scrollable_frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
                     bg="#EDCC6F", fg="#2B2C41").pack(pady=10)
             return
 
         # Pet selection dropdown
-        tk.Label(self.scrollable_frame, text="Select Pet:", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
+        tk.Label(self.scrollable_frame, text="Select Pet:", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5)
         pet_names = [pet["name"] for pet in pets]
         selected_pet = tk.StringVar()
         pet_dropdown = ttk.Combobox(self.scrollable_frame, textvariable=selected_pet, values=pet_names, state="readonly", font=("Century Gothic", 15))
         pet_dropdown.pack(pady=5)
 
         # Grooming services radio buttons
-        tk.Label(self.scrollable_frame, text="Select Service:", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
+        tk.Label(self.scrollable_frame, text="Select Service:", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5)
         selected_service = tk.StringVar()
         services = ["Basic Grooming", "Full Grooming", "Nail Clipping", "Ear Cleaning", "Bath & Blow Dry"]
         for i, service in enumerate(services):
-            tk.Radiobutton(self.scrollable_frame, text=service, variable=selected_service, value=service, font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(anchor="w", padx=10)
+            tk.Radiobutton(self.scrollable_frame, text=service, variable=selected_service, value=service, font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(anchor="w", padx=10)
 
-        # Date selection using Calendar
-        tk.Label(self.scrollable_frame, text="Select Date:", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
-        calendar = Calendar(self.scrollable_frame, selectmode="day")
-        calendar.pack(pady=5)
+        # Date selection dropdown
+        tk.Label(self.scrollable_frame, text="Select Date:", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5)
+        available_dates = ["2025-03-25", "2025-03-26", "2025-03-27", "2025-03-28"]  # Example dates
+        selected_date = tk.StringVar(value=available_dates[0])
+        date_dropdown = ttk.Combobox(self.scrollable_frame, textvariable=selected_date, values=available_dates, state="readonly", font=("Century Gothic", 15))
+        date_dropdown.pack(pady=5)
 
         # Book button
         tk.Button(self.scrollable_frame, text="Book Service", font=("Century Gothic", 15), 
-                command=lambda: self.book_grooming(username, selected_pet.get(), selected_service.get(), calendar.get_date()), 
+                command=lambda: self.book_grooming(username, selected_pet.get(), selected_service.get(), selected_date.get()), 
                 bg="#EDCC6F", fg="#2B2C41").pack(pady=10)
 
         # My grooming appointments
-        tk.Label(self.scrollable_frame, text="My Grooming Appointments", font=("Century Gothic", 20), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
+        tk.Label(self.scrollable_frame, text="My Grooming Appointments", font=("Century Gothic", 20), bg="#D2EBFF", fg="#2B2C41").pack(pady=20)
         appointments = db.get_grooming_appointments(username, status="Pending")  # Fetch only pending appointments
         if appointments:
             for i, appointment in enumerate(appointments):
-                tk.Label(self.scrollable_frame, text=f"{i + 1}. {appointment['pet_name']} - {appointment['service_type']} - {appointment['service_date']}", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
+                tk.Label(self.scrollable_frame, text=f"{i + 1}. {appointment['pet_name']} - {appointment['service_type']} - {appointment['service_date']}", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5)
                 tk.Button(
                     self.scrollable_frame,
                     text="Cancel",
@@ -767,59 +723,24 @@ class PetServiceManagementSystem:
                     fg="#2B2C41"
                 ).pack(pady=5)  # Ensure the button is displayed
         else:
-            tk.Label(self.scrollable_frame, text="No grooming appointments found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
+            tk.Label(self.scrollable_frame, text="No grooming appointments found.", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5)
 
         # Back button centered at the bottom
-        back_button_frame = tk.Frame(self.scrollable_frame, bg="#D2EBFF")  # Create a frame for the back button
-        back_button_frame.pack(pady=20)
+        back_button_frame = tk.Frame(self.frame, bg="#D2EBFF")  # Create a frame for the back button
+        back_button_frame.pack(pady=20)  # Add padding around the button frame
         tk.Button(back_button_frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
                 bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
 
-    def book_grooming(self, username, pet_name, service_type, service_date):
-    # Book a grooming service for a pet
-        try:
-            if not pet_name:
-                raise ValueError("Please select a pet.")
-            if not service_type:
-                raise ValueError("Please select a service.")
-            if not service_date:
-                raise ValueError("Please select a date.")
-
-        # Get user ID from the database
-            user_id = db.get_user_id(username)
-            if not user_id:
-                raise ValueError("User not found.")
-
-        # Add the grooming service to the database
-            db.add_grooming_service(user_id, pet_name, service_type, service_date)
-
-        # Show success message and refresh the grooming services screen
-            messagebox.showinfo("Success", f"Grooming service booked for {pet_name} on {service_date}.")
-            self.GroomingServices(username)
-        except ValueError as ve:
-            messagebox.showerror("Input Error", str(ve))
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to book grooming service: {e}")
-            
-    def cancel_grooming(self, username, appointment_id):
-    # Cancel a grooming appointment by its ID
-        try:
-            db.cancel_grooming_appointment(appointment_id)  # Call the database function to delete the appointment
-            messagebox.showinfo("Success", "Grooming appointment canceled successfully!")
-            self.GroomingServices(username)  # Refresh the grooming services screen
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to cancel appointment: {e}")
-
     def Daycare(self, username):
-        # Manage daycare bookings for the user's pets
+        # Manage daycare bookings for the user's pets.
         self.clear_frame()
         
-        # Title label
-        tk.Label(self.frame, text="🏠 DAYCARE BOOKING 🏠", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
+        # Title label with updated font and color
+        tk.Label(self.frame, text="DAYCARE BOOKING", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
         # Create a scrollable frame for daycare bookings
-        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=500, height=500, bd=0)
-        self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
+        self.canvas = tk.Canvas(self.frame, bg="#D2EBFF")
+        self.scrollable_frame = tk.Frame(self.canvas, bg="#D2EBFF")
         self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
         
         self.scrollable_frame.bind(
@@ -827,7 +748,7 @@ class PetServiceManagementSystem:
             lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=500)
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -836,25 +757,25 @@ class PetServiceManagementSystem:
         # Fetch user's pets
         pets = db.get_user_pets(username)
         if not pets:
-            tk.Label(self.scrollable_frame, text="No pets registered. Please add a pet first.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
+            tk.Label(self.scrollable_frame, text="No pets registered. Please add a pet first.", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=10)
             tk.Button(self.scrollable_frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
                     bg="#EDCC6F", fg="#2B2C41").pack(pady=10)
             return
 
         # Pet selection dropdown
-        tk.Label(self.scrollable_frame, text="Select Pet:", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
+        tk.Label(self.scrollable_frame, text="Select Pet:", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5)
         pet_names = [pet["name"] for pet in pets]
         selected_pet = tk.StringVar()
         pet_dropdown = Combobox(self.scrollable_frame, textvariable=selected_pet, values=pet_names, state="readonly", font=("Century Gothic", 15))
         pet_dropdown.pack(pady=5)
 
         # Date selection using Calendar
-        tk.Label(self.scrollable_frame, text="Select Date:", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
+        tk.Label(self.scrollable_frame, text="Select Date:", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5)
         calendar = Calendar(self.scrollable_frame, selectmode="day")
         calendar.pack(pady=5)
 
         # Drop-off time
-        tk.Label(self.scrollable_frame, text="Drop-off Time:", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
+        tk.Label(self.scrollable_frame, text="Drop-off Time:", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5)
         drop_off_frame = tk.Frame(self.scrollable_frame)
         drop_off_frame.pack(pady=5)
         drop_off_hour = Combobox(drop_off_frame, values=[f"{i:02}" for i in range(1, 13)], width=5, state="readonly")
@@ -868,7 +789,7 @@ class PetServiceManagementSystem:
         drop_off_ampm.grid(row=0, column=2, padx=2)
 
         # Pick-up time
-        tk.Label(self.scrollable_frame, text="Pick-up Time:", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
+        tk.Label(self.scrollable_frame, text="Pick-up Time:", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5)
         pick_up_frame = tk.Frame(self.scrollable_frame)
         pick_up_frame.pack(pady=5)
         pick_up_hour = Combobox(pick_up_frame, values=[f"{i:02}" for i in range(1, 13)], width=5, state="readonly")
@@ -898,11 +819,11 @@ class PetServiceManagementSystem:
         ).pack(pady=10)
 
         # My daycare appointments
-        tk.Label(self.scrollable_frame, text="My Daycare Appointments", font=("Century Gothic", 20), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
+        tk.Label(self.scrollable_frame, text="My Daycare Appointments", font=("Century Gothic", 20), bg="#D2EBFF", fg="#2B2C41").pack(pady=20)
         appointments = db.get_daycare_appointments(username, status="Pending")  # Fetch only pending appointments
         if appointments:
             for i, appointment in enumerate(appointments):
-                tk.Label(self.scrollable_frame, text=f"{i + 1}. {appointment['pet_name']} - {appointment['date']}", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
+                tk.Label(self.scrollable_frame, text=f"{i + 1}. {appointment['pet_name']} - {appointment['date']}", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5)
                 tk.Button(
                     self.scrollable_frame,
                     text="Cancel",
@@ -912,16 +833,16 @@ class PetServiceManagementSystem:
                     fg="#2B2C41"
                 ).pack(pady=5)  # Ensure the button is displayed
         else:
-            tk.Label(self.scrollable_frame, text="No daycare appointments found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
+            tk.Label(self.scrollable_frame, text="No daycare appointments found.", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5)
 
         # Back button centered at the bottom
-        back_button_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED")  # Create a frame for the back button
-        back_button_frame.pack(pady=20)
+        back_button_frame = tk.Frame(self.frame, bg="#D2EBFF")  # Create a frame for the back button
+        back_button_frame.pack(pady=20)  # Add padding around the button frame
         tk.Button(back_button_frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
                 bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
 
     def cancel_daycare(self, username, appointment_id):
-        # Cancel a daycare appointment by its ID
+        # Cancel a daycare appointment by its ID.
         try:
             db.cancel_daycare_appointment(appointment_id)  # Correct function call
             messagebox.showinfo("Success", "Daycare appointment canceled successfully!")
@@ -930,7 +851,7 @@ class PetServiceManagementSystem:
             messagebox.showerror("Error", f"Failed to cancel appointment: {e}")
 
     def submit_daycare_booking(self, username, pet_name, date, drop_off_time, pick_up_time):
-        # Submit a daycare booking for a pet
+        # Submit a daycare booking for a pet.
         try:
             if not pet_name:
                 raise ValueError("Please select a pet.")
@@ -939,18 +860,23 @@ class PetServiceManagementSystem:
             if not drop_off_time or not pick_up_time:
                 raise ValueError("Please specify both drop-off and pick-up times.")
 
-            # Get user ID from the username
             user_id = db.get_user_id(username)
             if not user_id:
-                raise ValueError("User not found.")
+                raise ValueError("User  not found.")
 
-            # Save the booking to the daycare_bookings table
-            status = "Pending"
-            db.add_daycare_booking(user_id, pet_name, date, drop_off_time, pick_up_time, status)
+            # Save to service history with status 'Pending'
+            status = "Pending"  # Change this to 'Done' if you want it to be marked as completed immediately
+            db.add_service_history(
+                user_id,
+                pet_name,
+                "Daycare",
+                date=date,
+                details=f"Drop-off: {drop_off_time}, Pick-up: {pick_up_time}",
+                status=status
+            )
 
-            # Show success message
             messagebox.showinfo("Success", f"Daycare booked for {pet_name} on {date}.\nDrop-off: {drop_off_time}, Pick-up: {pick_up_time}")
-            self.Daycare(username)  # Refresh the daycare page
+            self.Daycare(username)
         except ValueError as ve:
             messagebox.showerror("Input Error", str(ve))
         except Exception as e:
@@ -959,98 +885,101 @@ class PetServiceManagementSystem:
     def ServiceHistory(self, username):
         # Display the service history for the user, including grooming and daycare services
         self.clear_frame()
-    
+        
         # Title label
         tk.Label(self.frame, text="🔎 SERVICE HISTORY 🔍", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
-    
-        # Get the user ID
+
         user_id = db.get_user_id(username)
         if not user_id:
-            tk.Label(self.frame, text="User not found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
+            tk.Label(self.frame, text="User  not found.", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=10)
             tk.Button(self.frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
-                      bg="#EDCC6F", fg="#2B2C41").pack(pady=20)
+                    bg="#EDCC6F", fg="#2B2C41").pack(pady=20)
             return
-    
+
         # Create a scrollable frame for service history
-        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=900, height=500)
-        self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
+        self.canvas = tk.Canvas(self.frame, bg="#D2EBFF")
+        self.scrollable_frame = tk.Frame(self.canvas, bg="#D2EBFF")
         self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
-    
+        
         self.scrollable_frame.bind(
             "<Configure>",
             lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
-    
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw", width=900)
+
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
-    
+
         self.canvas.pack(side="left", fill="both", expand=True)
         self.scrollbar.pack(side="right", fill="y")
-    
+
         # Fetch grooming and daycare services with status 'Done'
-        grooming_history = db.get_grooming_services_done_for_user(user_id)
-        daycare_history = db.get_daycare_services_done_for_user(user_id)
-    
+        grooming_history = db.get_grooming_services_done(user_id)
+        daycare_history = db.get_daycare_services_done(user_id)
+
         if not grooming_history and not daycare_history:
-            tk.Label(self.scrollable_frame, text="No service history found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
+            tk.Label(self.scrollable_frame, text="No service history found.", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=10)
         else:
             # Display Grooming Services
             if grooming_history:
-                tk.Label(self.scrollable_frame, text="Grooming Services", font=("Century Gothic", 20), bg="#FFFFED", fg="#2B2C41").pack(pady=20, anchor="w")
+                tk.Label(self.scrollable_frame, text="Grooming Services", font=("Century Gothic", 20), bg="#D2EBFF", fg="#2B2C41").pack(pady=20, anchor="w")
                 for record in grooming_history:
-                    details = f"Pet: {record['pet_name']} | Date: {record['service_date']} | Service: {record['service_type']}"
-                    tk.Label(self.scrollable_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5, anchor="w")
-    
+                    details = f"Pet: {record['pet_name']} | Date: {record['date']} | Service: {record['service_type']}"
+                    tk.Label(self.scrollable_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5, anchor="w")
+            else:
+                tk.Label(self.scrollable_frame, text="No grooming services found.", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5, anchor="w")
+
             # Display Daycare Services
             if daycare_history:
-                tk.Label(self.scrollable_frame, text="Daycare Services", font=("Century Gothic", 20), bg="#FFFFED", fg="#2B2C41").pack(pady=20, anchor="w")
+                tk.Label(self.scrollable_frame, text="Daycare Services", font=("Century Gothic", 20), bg="#D2EBFF", fg="#2B2C41").pack(pady=20, anchor="w")
                 for record in daycare_history:
-                    details = f"Pet: {record['pet_name']} | Date: {record['date']} | Drop-off: {record['drop_off_time']} | Pick-up: {record['pick_up_time']}"
-                    tk.Label(self.scrollable_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5, anchor="w")
-    
+                    details = f"Pet: {record['pet_name']} | Date: {record['date']} | Details: {record['details']}"
+                    tk.Label(self.scrollable_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5, anchor="w")
+            else:
+                tk.Label(self.scrollable_frame, text="No daycare services found.", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").pack(pady=5, anchor="w")
+
         # Back button centered at the bottom
-        back_button_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED")  # Create a frame for the back button
-        back_button_frame.pack(pady=20)
+        back_button_frame = tk.Frame(self.frame, bg="#D2EBFF")  # Create a frame for the back button
+        back_button_frame.pack(pady=20)  # Add padding around the button frame
         tk.Button(back_button_frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
-                  bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
+                bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
 
     def AddPet(self, username):
         # Display the interface for adding a new pet
         self.clear_frame()
         
-        # Title label
+        # Title label with updated font and color
         tk.Label(self.frame, text="💖 ADD PET 💖", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
         # Create a frame for the input fields
-        input_frame = tk.Frame(self.frame, bg="#FFFFED")  # Frame for input fields
-        input_frame.pack(pady=20, padx=30)
+        input_frame = tk.Frame(self.frame, bg="#D2EBFF")  # Frame for input fields
+        input_frame.pack(pady=20, padx=30)  # Add padding around the input frame
 
         # Name input
-        tk.Label(input_frame, text="Name", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=0, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(input_frame, text="Name", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=0, column=0, padx=10, pady=5, sticky="w")
         pet_name = tk.Entry(input_frame, font=("Century Gothic", 15))
         pet_name.grid(row=0, column=1, padx=10, pady=5)
 
         # Species input
-        tk.Label(input_frame, text="Species", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(input_frame, text="Species", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=1, column=0, padx=10, pady=5, sticky="w")
         species_options = ["Dog", "Cat"]
         pet_species = Combobox(input_frame, values=species_options, state="readonly", font=("Century Gothic", 15))
         pet_species.grid(row=1, column=1, padx=10, pady=5)
 
         # Age input
-        tk.Label(input_frame, text="Age", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(input_frame, text="Age", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=2, column=0, padx=10, pady=5, sticky="w")
         pet_age = tk.Entry(input_frame, font=("Century Gothic", 15))
         pet_age.grid(row=2, column=1, padx=10, pady=5)
 
         # Upload Picture
-        tk.Label(input_frame, text="Upload Picture", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").grid(row=3, column=0, padx=10, pady=5, sticky="w")
-        picture_path_label = tk.Label(input_frame, text="No file selected", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41")
+        tk.Label(input_frame, text="Upload Picture", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41").grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        picture_path_label = tk.Label(input_frame, text="No file selected", font=("Century Gothic", 15), bg="#D2EBFF", fg="#2B2C41")
         picture_path_label.grid(row=3, column=1, padx=10, pady=5)
         upload_button = tk.Button(input_frame, text="Upload Picture", command=lambda: self.upload_picture(picture_path_label), font=("Century Gothic", 15), bg="#EDCC6F", fg="#2B2C41")
         upload_button.grid(row=4, column=1, padx=10, pady=5)
 
         # Save and Cancel buttons
         button_frame = tk.Frame(self.frame, bg="#FFFFED")  # Frame for buttons
-        button_frame.pack(pady=20)
+        button_frame.pack(pady=20)  # Add padding around the button frame
 
         save_button = tk.Button(
             button_frame,
@@ -1065,7 +994,7 @@ class PetServiceManagementSystem:
         back_button.pack(side=tk.LEFT, padx=10)
         
     def upload_picture(self, label):
-        # Open a file dialog to select a picture and update the label with the file path
+        # Open a file dialog to select a picture and update the label with the file path.
         file_path = filedialog.askopenfilename(
             title="Select a Picture",
             filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.bmp;*.gif")]
@@ -1074,9 +1003,9 @@ class PetServiceManagementSystem:
             label.config(text=file_path)
 
     def submit_pet(self, username, name, species, age, picture_path=None):
-        # Submit a new pet to the database
+        # Submit a new pet to the database.
         try:
-            if not all([username, name, species, age]) or picture_path == "No file selected":
+            if not all([username, name, species, age]):
                 raise ValueError("All fields are required.")
             age = int(age) if age.isdigit() else None
             if age is None:
