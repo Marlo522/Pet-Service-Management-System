@@ -425,7 +425,7 @@ class PetServiceManagementSystem:
             if grooming_history:
                 tk.Label(self.scrollable_frame, text="Grooming Services", font=("Century Gothic", 20), bg="#FFFFED", fg="#2B2C41").pack(pady=20, anchor="w")
                 for record in grooming_history:
-                    details = f"Pet: {record['pet_name']} | Date: {record['service_date']} | Service: {record['service_type']}"
+                    details = f"Owner ID: {record['user_id']} | Pet: {record['pet_name']} | Date: {record['service_date']} | Service: {record['service_type']}"
                     tk.Label(
                         self.scrollable_frame,
                         text=details,
@@ -441,7 +441,7 @@ class PetServiceManagementSystem:
             if daycare_history:
                 tk.Label(self.scrollable_frame, text="Daycare Services", font=("Century Gothic", 20), bg="#FFFFED", fg="#2B2C41").pack(pady=20, anchor="w")
                 for record in daycare_history:
-                    details = f"Pet: {record['pet_name']} | Date: {record['date']} | Drop-off: {record['drop_off_time']} | Pick-up: {record['pick_up_time']}"
+                    details = f"Owner ID: {record['user_id']} | Pet: {record['pet_name']} | Date: {record['date']} | Drop-off: {record['drop_off_time']} | Pick-up: {record['pick_up_time']}"
                     tk.Label(
                         self.scrollable_frame,
                         text=details,

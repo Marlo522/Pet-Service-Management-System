@@ -426,8 +426,20 @@ def update_pet_name_in_grooming_services(user_id, old_name, new_name):
         conn.commit()
     finally:
         conn.close()
-    
-        
+
+def update_pet_name_in_daycare_services(user_id, old_name, new_name):
+    """Update the pet name in the daycare bookings table."""
+    try:
+        conn = sqlite3.connect('Systemdb.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE daycare_bookings
+            SET pet_name = ?
+            WHERE user_id = ? AND pet_name = ?
+        """, (new_name, user_id, old_name))
+        conn.commit()
+    finally:
+        conn.close()
 def update_grooming_status(appointment_id, new_status):
     """Update the status of a grooming appointment."""
     try:
