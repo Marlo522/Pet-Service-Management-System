@@ -703,16 +703,14 @@ class PetServiceManagementSystem:
         for i, service in enumerate(services):
             tk.Radiobutton(self.scrollable_frame, text=service, variable=selected_service, value=service, font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(anchor="w", padx=10)
 
-        # Date selection dropdown
+        # Date selection using Calendar
         tk.Label(self.scrollable_frame, text="Select Date:", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=5)
-        available_dates = ["2025-03-25", "2025-03-26", "2025-03-27", "2025-03-28"]  # Example dates
-        selected_date = tk.StringVar(value=available_dates[0])
-        date_dropdown = ttk.Combobox(self.scrollable_frame, textvariable=selected_date, values=available_dates, state="readonly", font=("Century Gothic", 15))
-        date_dropdown.pack(pady=5)
+        calendar = Calendar(self.scrollable_frame, selectmode="day")
+        calendar.pack(pady=5)
 
         # Book button
         tk.Button(self.scrollable_frame, text="Book Service", font=("Century Gothic", 15), 
-                command=lambda: self.book_grooming(username, selected_pet.get(), selected_service.get(), selected_date.get()), 
+                command=lambda: self.book_grooming(username, selected_pet.get(), selected_service.get(), calendar.get_date()), 
                 bg="#EDCC6F", fg="#2B2C41").pack(pady=10)
 
         # My grooming appointments
@@ -737,7 +735,7 @@ class PetServiceManagementSystem:
         back_button_frame.pack(pady=20)  # Add padding around the button frame
         tk.Button(back_button_frame, text="Back", command=lambda: self.load_user_dashboard(username), font=("Century Gothic", 15), 
                 bg="#EDCC6F", fg="#2B2C41").pack()  # Center the button in the frame
-        
+
     def book_grooming(self, username, pet_name, service_type, service_date):
     # Book a grooming service for a pet.
         try:
