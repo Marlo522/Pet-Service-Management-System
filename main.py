@@ -45,8 +45,6 @@ class PetServiceManagementSystem:
         tk.Button(button_box, text="USER 👤", command=self.User, **self.button_style).pack(pady=10)
         tk.Button(button_box, text="ADMIN 🔐", command=self.Admin, **self.button_style).pack(pady=10)
 
-        self.appointments = []
-
     def clear_frame(self):
         # Clear all widgets from the current frame
         for widget in self.frame.winfo_children():
@@ -210,11 +208,11 @@ class PetServiceManagementSystem:
     def manage_all_pets(self):
     # Display and manage all registered pets
         self.clear_frame()
-    
+
     # Title label
         tk.Label(self.frame, text="🐕 MANAGE PETS 🐈", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
-        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=900, height=500)
+        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=450, height=500)
         self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
         self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
 
@@ -223,7 +221,7 @@ class PetServiceManagementSystem:
         lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=900)
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=450)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -235,15 +233,22 @@ class PetServiceManagementSystem:
                 pet_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED", bd=1, relief="solid")
                 pet_frame.pack(pady=10, padx=10, fill="x")
 
-            # Display pet details
-                tk.Label(pet_frame, text=f"User ID: {pet['user_id']}", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(anchor="w", padx=10, pady=2)
-                tk.Label(pet_frame, text=f"Name: {pet['name']}", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(anchor="w", padx=10, pady=2)
-                tk.Label(pet_frame, text=f"Species: {pet['species']}", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(anchor="w", padx=10, pady=2)
-                tk.Label(pet_frame, text=f"Age: {pet['age']}", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(anchor="w", padx=10, pady=2)
-                tk.Label(pet_frame, text=f"Picture:", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(anchor="w", padx=10, pady=2)
+            # First row: Labels
+                tk.Label(pet_frame, text="User ID", font=("Century Gothic", 12, "bold"), bg="#FFFFED", fg="#2B2C41").grid(row=0, column=0, padx=10, pady=2, sticky="w")
+                tk.Label(pet_frame, text="Name", font=("Century Gothic", 12, "bold"), bg="#FFFFED", fg="#2B2C41").grid(row=0, column=1, padx=10, pady=2, sticky="w")
+                tk.Label(pet_frame, text="Species", font=("Century Gothic", 12, "bold"), bg="#FFFFED", fg="#2B2C41").grid(row=0, column=2, padx=10, pady=2, sticky="w")
+                tk.Label(pet_frame, text="Age", font=("Century Gothic", 12, "bold"), bg="#FFFFED", fg="#2B2C41").grid(row=0, column=3, padx=10, pady=2, sticky="w")
+                tk.Label(pet_frame, text="Picture", font=("Century Gothic", 12, "bold"), bg="#FFFFED", fg="#2B2C41").grid(row=0, column=4, padx=10, pady=2, sticky="w")
+
+            # Second row: Data
+                tk.Label(pet_frame, text=f"{pet['user_id']}", font=("Century Gothic", 12), bg="#FFFFED", fg="#2B2C41").grid(row=1, column=0, padx=10, pady=2, sticky="w")
+                tk.Label(pet_frame, text=f"{pet['name']}", font=("Century Gothic", 12), bg="#FFFFED", fg="#2B2C41").grid(row=1, column=1, padx=10, pady=2, sticky="w")
+                tk.Label(pet_frame, text=f"{pet['species']}", font=("Century Gothic", 12), bg="#FFFFED", fg="#2B2C41").grid(row=1, column=2, padx=10, pady=2, sticky="w")
+                tk.Label(pet_frame, text=f"{pet['age']}", font=("Century Gothic", 12), bg="#FFFFED", fg="#2B2C41").grid(row=1, column=3, padx=10, pady=2, sticky="w")
+
             # Display pet picture
                 image_frame = tk.Frame(pet_frame, bg="#FFFFED")
-                image_frame.pack(side=tk.LEFT, padx=10, pady=10)
+                image_frame.grid(row=1, column=4, padx=10, pady=2, sticky="s")
                 try:
                     if pet["picture_path"]:
                         pil_image = Image.open(pet["picture_path"]).resize((100, 100), Image.LANCZOS)
@@ -252,12 +257,12 @@ class PetServiceManagementSystem:
                         image_label.image = image  # Keep a reference to avoid garbage collection
                         image_label.pack()
                     else:
-                        tk.Label(image_frame, text="No Image", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack()
+                        tk.Label(image_frame, text="No Image", font=("Century Gothic", 10), bg="#FFFFED", fg="#2B2C41").pack()
                 except Exception as e:
                     print(f"Error loading image: {e}")
-                    tk.Label(image_frame, text="Error Displaying Image", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack()
+                    tk.Label(image_frame, text="Error Displaying Image", font=("Century Gothic", 10), bg="#FFFFED", fg="#2B2C41").pack()
 
-            # Add delete button
+            # Third row: Delete button
                 tk.Button(
                 pet_frame,
                 text="Delete",
@@ -265,7 +270,8 @@ class PetServiceManagementSystem:
                 bg="#EDCC6F",
                 fg="#2B2C41",
                 command=lambda pet=pet: self.delete_pet(pet['user_id'], pet['name'])
-                ).pack(anchor="s", padx=10, pady=5)
+                ).grid(row=2, column=0, columnspan=5, pady=5)
+
         else:
             tk.Label(self.scrollable_frame, text="No pets found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
 
@@ -591,7 +597,7 @@ class PetServiceManagementSystem:
         tk.Label(self.frame, text="🥫 MANAGE MY PETS 🥫", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
     # Create a scrollable frame for pets
-        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=700, height=500)  # Adjusted width to match frame
+        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=600, height=500, bd=0)
         self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
         self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
     
@@ -600,7 +606,7 @@ class PetServiceManagementSystem:
         lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
     )
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=700)  # Adjusted width
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=600)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -609,12 +615,12 @@ class PetServiceManagementSystem:
         pets = db.get_user_pets(username)
         if pets:
             for pet in pets:
-                pet_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED", bd=1, relief="solid", width=700)  # Adjusted width
+                pet_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED", bd=1, relief="solid")  # Frame for each pet
                 pet_frame.pack(fill=tk.X, padx=10, pady=10)
 
             # Display pet details
-                details_frame = tk.Frame(pet_frame, bg="#FFFFED", width=900)
-                details_frame.pack(side=tk.LEFT, padx=10, pady=10, fill=tk.BOTH, expand=True)
+                details_frame = tk.Frame(pet_frame, bg="#FFFFED")
+                details_frame.pack(side=tk.LEFT, padx=10, pady=10)
 
                 details = f"Name: {pet['name']}\nSpecies: {pet['species']}\nAge: {pet['age']}"
                 tk.Label(details_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(anchor="w")
@@ -637,7 +643,7 @@ class PetServiceManagementSystem:
 
             # Add Edit and Delete buttons
                 button_frame = tk.Frame(pet_frame, bg="#FFFFED")
-                button_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=5)
+                button_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=10, anchor="s") # Increased padding to move buttons down
                 tk.Button(button_frame, text="Edit", command=lambda pet=pet: self.EditPet(username, pet), font=("Century Gothic", 15), bg="#EDCC6F", fg="#2B2C41").pack(side=tk.LEFT, padx=5)
                 tk.Button(button_frame, text="Delete", command=lambda pet=pet: self.DeletePet(username, pet['name']), font=("Century Gothic", 15), bg="#EDCC6F", fg="#2B2C41").pack(side=tk.LEFT, padx=5)
         else:
