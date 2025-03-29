@@ -591,7 +591,7 @@ class PetServiceManagementSystem:
         tk.Label(self.frame, text="🥫 MANAGE MY PETS 🥫", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
     # Create a scrollable frame for pets
-        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=500, height=500, bd=0)
+        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=700, height=500)  # Adjusted width to match frame
         self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
         self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
     
@@ -600,7 +600,7 @@ class PetServiceManagementSystem:
         lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
     )
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=500)
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=700)  # Adjusted width
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -609,12 +609,12 @@ class PetServiceManagementSystem:
         pets = db.get_user_pets(username)
         if pets:
             for pet in pets:
-                pet_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED", bd=1, relief="solid")  # Frame for each pet
+                pet_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED", bd=1, relief="solid", width=700)  # Adjusted width
                 pet_frame.pack(fill=tk.X, padx=10, pady=10)
 
             # Display pet details
-                details_frame = tk.Frame(pet_frame, bg="#FFFFED")
-                details_frame.pack(side=tk.LEFT, padx=10, pady=10)
+                details_frame = tk.Frame(pet_frame, bg="#FFFFED", width=900)
+                details_frame.pack(side=tk.LEFT, padx=10, pady=10, fill=tk.BOTH, expand=True)
 
                 details = f"Name: {pet['name']}\nSpecies: {pet['species']}\nAge: {pet['age']}"
                 tk.Label(details_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(anchor="w")
