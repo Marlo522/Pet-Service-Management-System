@@ -165,64 +165,115 @@ class PetServiceManagementSystem:
                 bg="#EDCC6F", fg="#2B2C41", width=25).pack(pady=20)
 
     def manage_all_users(self):
-        # Display and manage all registered users
+    # Display and manage all registered users
         self.clear_frame()
-        
-        # Title label
+    
+    # Title label
         tk.Label(self.frame, text="👥 MANAGE USERS 👥", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
-        # Create a box frame for user management
-        user_box = tk.Frame(self.frame, bg="#FFFFED", bd=0)  # Create a frame without a border
-        user_box.pack(pady=20, padx=30)
+        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=500, height=500)
+        self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
+        self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
 
+        self.scrollable_frame.bind(
+        "<Configure>",
+        lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        )
+
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=500)
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.scrollbar.pack(side="right", fill="y")
+    
         users = db.get_all_users()  # Fetch all users from the database
         if users:
             for user in users:
-                user_frame = tk.Frame(user_box, bg="#FFFFED", bd=0)  # Frame for each user
+                user_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED", bd=0)
                 user_frame.pack(fill=tk.X, padx=10, pady=5)
 
                 details = f"ID: {user['id']}, Username: {user['username']}"
                 tk.Label(user_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(side=tk.LEFT, padx=10)
 
-                # Button to delete the user
+            # Button to delete the user
                 tk.Button(user_frame, text="Delete", command=lambda user_id=user['id']: self.delete_user(user_id), 
-                        font=("Century Gothic", 15), bg="#EDCC6F", fg="#2B2C41").pack(side=tk.RIGHT, padx=10)
+                    font=("Century Gothic", 15), bg="#EDCC6F", fg="#2B2C41").pack(side=tk.RIGHT, padx=10)
         else:
-            tk.Label(self.frame, text="No users found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
+            tk.Label(self.scrollable_frame, text="No users found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
 
-        # Back button
-        tk.Button(self.frame, text="Back", command=self.load_admin_dashboard, font=("Century Gothic", 15), 
-                bg="#EDCC6F", fg="#2B2C41").pack(pady=20)
+    # Add a frame for the back button at the bottom of the canvas
+        back_button_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED")
+        back_button_frame.pack(pady=20)
+        tk.Button(back_button_frame, text="Back", command=self.load_admin_dashboard, font=("Century Gothic", 15), 
+              bg="#EDCC6F", fg="#2B2C41").pack()
     
     def manage_all_pets(self):
-        # Display and manage all registered pets
+    # Display and manage all registered pets
         self.clear_frame()
-        
-        # Title label
+    
+    # Title label
         tk.Label(self.frame, text="🐕 MANAGE PETS 🐈", font=("Century Gothic", 20, "bold"), bg="#FFFFED", fg="#2B2C41").pack(pady=20)
 
-        # Create a box frame for pets
-        pet_box = tk.Frame(self.frame, bg="#FFFFED", bd=0)  # Create a frame without a border
-        pet_box.pack(pady=20, padx=30)
+        self.canvas = tk.Canvas(self.frame, bg="#FFFFED", width=900, height=500)
+        self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFED")
+        self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
+
+        self.scrollable_frame.bind(
+        "<Configure>",
+        lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        )
+
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n", width=900)
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.scrollbar.pack(side="right", fill="y")
 
         pets = db.get_all_pets()  # Fetch all pets from the database
         if pets:
             for pet in pets:
-                pet_frame = tk.Frame(pet_box, bg="#FFFFED", bd=0)  # Frame for each pet
-                pet_frame.pack(fill=tk.X, padx=10, pady=5)
+                pet_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED", bd=1, relief="solid")
+                pet_frame.pack(pady=10, padx=10, fill="x")
 
-                details = f"Name: {pet['name']}, Species: {pet['species']}, Owner ID: {pet['user_id']}"
-                tk.Label(pet_frame, text=details, justify="left", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(side=tk.LEFT, padx=10)
+            # Display pet details
+                tk.Label(pet_frame, text=f"User ID: {pet['user_id']}", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(anchor="w", padx=10, pady=2)
+                tk.Label(pet_frame, text=f"Name: {pet['name']}", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(anchor="w", padx=10, pady=2)
+                tk.Label(pet_frame, text=f"Species: {pet['species']}", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(anchor="w", padx=10, pady=2)
+                tk.Label(pet_frame, text=f"Age: {pet['age']}", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(anchor="w", padx=10, pady=2)
+                tk.Label(pet_frame, text=f"Picture:", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(anchor="w", padx=10, pady=2)
+            # Display pet picture
+                image_frame = tk.Frame(pet_frame, bg="#FFFFED")
+                image_frame.pack(side=tk.LEFT, padx=10, pady=10)
+                try:
+                    if pet["picture_path"]:
+                        pil_image = Image.open(pet["picture_path"]).resize((100, 100), Image.LANCZOS)
+                        image = ImageTk.PhotoImage(pil_image)
+                        image_label = tk.Label(image_frame, image=image, bg="#FFFFED")
+                        image_label.image = image  # Keep a reference to avoid garbage collection
+                        image_label.pack()
+                    else:
+                        tk.Label(image_frame, text="No Image", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack()
+                except Exception as e:
+                    print(f"Error loading image: {e}")
+                    tk.Label(image_frame, text="Error Displaying Image", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack()
 
-                # Button to delete the pet
-                tk.Button(pet_frame, text="Delete", command=lambda pet_name=pet['name'], user_id=pet['user_id']: self.delete_pet(user_id, pet_name), 
-                        font=("Century Gothic", 15), bg="#EDCC6F", fg="#2B2C41").pack(side=tk.RIGHT, padx=10)
+            # Add delete button
+                tk.Button(
+                pet_frame,
+                text="Delete",
+                font=("Century Gothic", 12),
+                bg="#EDCC6F",
+                fg="#2B2C41",
+                command=lambda pet=pet: self.delete_pet(pet['user_id'], pet['name'])
+                ).pack(anchor="s", padx=10, pady=5)
         else:
-            tk.Label(self.frame, text="No pets found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
+            tk.Label(self.scrollable_frame, text="No pets found.", font=("Century Gothic", 15), bg="#FFFFED", fg="#2B2C41").pack(pady=10)
 
-        # Back button
-        tk.Button(self.frame, text="Back", command=self.load_admin_dashboard, font=("Century Gothic", 15), 
-                bg="#EDCC6F", fg="#2B2C41").pack(pady=20)
+    # Back button
+        back_button_frame = tk.Frame(self.scrollable_frame, bg="#FFFFED")
+        back_button_frame.pack(pady=20)
+        tk.Button(back_button_frame, text="Back", command=self.load_admin_dashboard, font=("Century Gothic", 15), 
+              bg="#EDCC6F", fg="#2B2C41").pack(pady=20)
 
     def delete_user(self, user_id):
         # Delete a user by ID

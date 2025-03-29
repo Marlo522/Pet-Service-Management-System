@@ -231,12 +231,23 @@ def get_all_pets():
     try:
         conn = sqlite3.connect('Systemdb.db')
         cursor = conn.cursor()
-        cursor.execute("SELECT user_id, name, species FROM pets")
-        pets = [{"user_id": row[0], "name": row[1], "species": row[2]} for row in cursor.fetchall()]
+        cursor.execute("SELECT user_id, name, species, age, picture_path FROM pets")
+        pets = []
+        for row in cursor.fetchall():
+            picture_path = row[4]
+            # Validate if the picture file exists
+            if picture_path and not os.path.exists(picture_path):
+                picture_path = None  # Set to None if the file doesn't exist
+            pets.append({
+                "user_id": row[0],
+                "name": row[1],
+                "species": row[2],
+                "age": row[3],
+                "picture_path": picture_path
+            })
         return pets
     finally:
         conn.close()
-        
 def add_grooming_service(user_id, pet_name, service_type, service_date, status='Pending'):
     """Add a grooming service booking to the database."""
     try:
